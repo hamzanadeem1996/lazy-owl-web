@@ -20,11 +20,6 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#chat">
-                        <i class="iconsmind-Pantone"></i> Chat
-                    </a>
-                </li>
-                <li>
                     <a href="#payment">
                         <i class="iconsmind-Space-Needle"></i> Payment
                     </a>

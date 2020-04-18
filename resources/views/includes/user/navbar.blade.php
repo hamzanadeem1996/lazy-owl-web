@@ -114,7 +114,13 @@
             </button>
 
             <div class="dropdown-menu dropdown-menu-right mt-3">
-                <h5 class="dropdown-item" id="neon-text">${{Auth::user()->wallet->amount}}</h5>
+                <h5 class="dropdown-item" id="neon-text">
+                    @if(Auth::user()->wallet)
+                        ${{Auth::user()->wallet->amount}}
+                    @else
+                        $0
+                    @endif
+                </h5>
                 <a class="dropdown-item" href="#">Account</a>
                 <a class="dropdown-item" href="/admin/logout">Sign out</a>
             </div>

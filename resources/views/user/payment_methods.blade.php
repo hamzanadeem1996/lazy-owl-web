@@ -21,11 +21,21 @@
                                     <div class="text-center">
                                         <img alt="Profile" src="/payment/{{$payment->image}}" class="img-thumbnail border-0 rounded-circle mb-4 list-thumbnail">
                                         <p class="list-item-heading mb-1">{{$payment->title}}</p>
-                                        @if(Auth::user()->role == 2)
+                                        {{-- @if(Auth::user()->role == 2) --}}
                                             <p class="mb-2 text-muted text-small">{{$payment->owner}}</p>
                                             <h3>{{$payment->acc_number}}</h3>
+                                        {{-- @endif --}}
+                                        @if(Auth::user()->role == 3)
+                                            @if($payment->id == 4)
+                                                <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#addBankDetailsModal">Add Details</button>
+                                            @else
+                                                <button type="button" onclick="setMethodId({{$payment->id}})" class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#addDetailsModal">Add Details</button>
+                                            @endif
+                                        @else
+                                            @if($payment->id == 4)
+                                                <button type="button" onclick="setMethodId({{$payment->id}})" class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#creditCardModal">Add Amount</button>
+                                            @endif
                                         @endif
-                                        <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#creditCardModal">Add amount</button>
                                     </div>
                                 </div>
                             </div>
@@ -69,5 +79,83 @@
     </div>
 </div>
 
+<div class="modal fade" id="addBankDetailsModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalContentLabel">Add Account Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                
+                <form action="/user/payment-method/details/add" method="POST" id="bank-acc-form">
+                    @csrf
+                    <div class="form-group">
+                        <label for="acc_title">Account Title *</label>
+                        <input class="form-control" type="text" name="acc_title" id="acc-title">
+                    </div>
+                    <div class="form-group">
+                        <label for="acc_number">Account Number *</label>
+                        <input class="form-control" type="number" name="acc_number" id="acc-number">
+                    </div>
+                    <div class="form-group">
+                        <label for="bank_name">Bank Name *</label>
+                        <input class="form-control" type="text" name="bank_name" id="bank-name">
+                    </div>
+                    <div class="form-group">
+                        <label for="branch_code">Branch Code *</label>
+                        <input class="form-control" type="number" name="branch_code" id="branch-code">
+                    </div>
+                    <input type="hidden" name="payment_method_id" value="4">
+                </form>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" onclick="submitForm('bank-acc-form')" class="btn btn-primary">Add</button>
+                </div>
+                    
+            </div>
+        </div>
+    </div>
+</div>
 
+<div class="modal fade" id="addDetailsModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalContentLabel">Add Account Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                
+                <form action="/user/payment-method/details/add" method="POST" id="simple-acc-form">
+                    @csrf
+                    <div class="form-group">
+                        <label for="acc_title">Account Number *</label>
+                        <input class="form-control" type="text" name="acc_number" id="acc-number">
+                    </div>
+                    <input type="hidden" name="payment_method_id" id="payment-method-id">
+                </form>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" onclick="submitForm('simple-acc-form')" class="btn btn-primary">Add</button>
+                </div>
+                    
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function submitForm(id){
+        $(`#${id}`).submit();
+    }
+
+    function setMethodId(id) {
+        $('#payment-method-id').val(id);
+    }
+</script>
 @stop

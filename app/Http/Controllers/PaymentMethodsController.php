@@ -35,4 +35,16 @@ class PaymentMethodsController extends Controller
         }
         return redirect()->back();
     }
+    
+    public function addAccountDetails(Request $request){
+        $data = $request->all();
+        $data['user_id'] = Auth::id();
+        $paymentMethod = $this->payment->addUserAccountDetails($data);
+        if ($paymentMethod['isSuccess'] == true){
+            Notify::success($paymentMethod['message']);
+        }else{
+            Notify::error($paymentMethod['message']);
+        }
+        return redirect()->back();
+    }
 }

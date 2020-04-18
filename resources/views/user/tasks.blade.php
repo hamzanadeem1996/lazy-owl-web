@@ -75,7 +75,9 @@
                                             <div class="w-15 w-xs-100">
                                                 <i class="fa fa-eye" id="edit-icon" onclick="getTaskDetails({{$task->id}}, 'view')" data-toggle="modal" data-target="#viewTaskModal"></i>
                                                 <i class="fa fa-edit" id="edit-icon" onclick="getTaskDetails({{$task->id}}, 'edit')" data-toggle="modal" data-target="#editTaskModal"></i>
-                                                <i class="fa fa-check" id="edit-icon" onclick="completeTask({{$task->id}})" data-toggle="modal" data-target="#completeTaskModal"></i>
+                                                @if($task->assigned_to != null)
+                                                    <i class="fa fa-check" id="edit-icon" onclick="completeTask({{$task->id}})" data-toggle="modal" data-target="#completeTaskModal"></i>
+                                                @endif
                                                 @if($task->assigned_to == null)
                                                     <i class="fa fa-gavel" id="edit-icon" onclick="getTaskBids({{$task->id}})" data-toggle="modal" data-target="#taskBidModal"></i>
                                                     <i class="fa fa-trash" id="edit-icon" onclick="deleteTask({{$task->id}})" data-toggle="modal" data-target="#deleteTaskModal"></i>
@@ -394,6 +396,8 @@
                                         <br><br>
                                         <h4 style="color: #922C88">Attachment :</h4>
                                         <br><br>
+                                        <h4 style="color: #922C88">Assigned to :</h4>
+                                        <br><br>
                                         <h4 style="color: #922C88">Details :</h4>
                                     </div>
                                     <div class="col-lg-6">
@@ -412,6 +416,8 @@
                                         <h4 id="view-location"></h4>
                                         <br><br>
                                         <h4><a id="view-attachment" href="" download></a></h4>
+                                        <br><br>
+                                        <h4><a id="assigned-to-user" href=""></a></h4>
                                         <br><br>
                                         <h4 id="view-details"></h4>
                                     </div>
@@ -677,6 +683,7 @@
     function getTaskDetails(id, type){
         $.get(`/user/project/${id}`).then((response) => {
             let data = JSON.parse(response);
+            console.log(data);
             let subCategories = data.all_sub_categories;
             if (type === 'view'){ 
                 $('#view-title').html(data.title);
@@ -689,6 +696,8 @@
                 $('#view-attachment').attr('href', data.media);
                 $('#view-attachment').html(data.media);
                 $('#view-details').html(data.description);
+                $('#assigned-to-user').html(data.assigned_to_user);
+                $('#assigned-to-user').attr('href', data.assigned_to_user_url);
             }else{ 
                 if (subCategories.length > 0){
                     $('#temp-sub-category').css('display', 'none');

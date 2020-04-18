@@ -128,5 +128,6 @@ Route::group(['prefix' => 'user', 'middleware' => 'auth'], function (){
    Route::post('/project/complete', 'ProjectController@completeProject');
    Route::get('/payment-methods', 'PaymentMethodsController@allPaymentMethodsList');
    Route::post('/payment', 'PaymentsController@addPayment');
+   Route::post('/payment-method/details/add', 'PaymentMethodsController@addAccountDetails');
 });
 
