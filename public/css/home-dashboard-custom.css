@@ -1,0 +1,30 @@
+.change-image {
+    margin-top: 5%; 
+    width: 200px; 
+    text-align: center; 
+    background-color: #73236B;
+    border-radius: 2%;
+}
+
+.change-image h4 {
+    color: white;
+    padding-top: 2%; 
+    padding-bottom: 2%
+}
+
+.change-image h4:hover {
+    cursor: pointer;
+}
+
+#edit-icon:hover {
+    cursor: pointer;
+}
+
+#cross-icon, #delete-service-icon:hover {
+    cursor: pointer;
+}
+
+#delete-service-icon {
+    color: red;
+}
+

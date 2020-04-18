@@ -1,0 +1,22 @@
+<script src="{{asset('/vendors/jquery/dist/jquery.min.js')}}"></script>
+<script src="{{asset('js/vendor/jquery-3.3.1.min.js')}}"></script>
+<script src="{{asset('js/vendor/bootstrap.bundle.min.js')}}"></script>
+<script src="{{asset('js/vendor/Chart.bundle.min.js')}}"></script>
+<script src="{{asset('js/vendor/chartjs-plugin-datalabels.js')}}"></script>
+<script src="{{asset('js/vendor/moment.min.js')}}"></script>
+<script src="{{asset('js/vendor/fullcalendar.min.js')}}"></script>
+<script src="{{asset('js/vendor/datatables.min.js')}}"></script>
+<script src="{{asset('js/vendor/perfect-scrollbar.min.js')}}"></script>
+<script src="{{asset('js/vendor/owl.carousel.min.js')}}"></script>
+<script src="{{asset('js/vendor/progressbar.min.js')}}"></script>
+<script src="{{asset('js/vendor/jquery.barrating.min.js')}}"></script>
+<script src="{{asset('js/vendor/select2.full.js')}}"></script>
+<script src="{{asset('js/vendor/nouislider.min.js')}}"></script>
+<script src="{{asset('js/vendor/bootstrap-datepicker.js')}}"></script>
+<script src="{{asset('js/vendor/Sortable.js')}}"></script>
+<script src="{{asset('js/vendor/mousetrap.min.js')}}"></script>
+<script src="{{asset('js/dore.script.js')}}"></script>
+<script src="{{asset('js/scripts.js')}}"></script>
+<script src="{{asset('js/vendor/bootstrap-notify.min.js')}}"></script>
+<script src="{{asset('/vendors/pnotify/dist/pnotify.js')}}"></script>
+@include('laravelPnotify::notify')
