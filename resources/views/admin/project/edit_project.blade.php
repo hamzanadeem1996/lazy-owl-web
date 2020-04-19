@@ -86,6 +86,24 @@
                                 </div>
 
                                 <div class="form-group">
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12">Posted By</label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12 text-center mt-5" style="font-size: 16">
+                                        <a href="/admin/user/edit/{{$project->user->id}}">{{$project->user->name}}</a>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12">Assigned To</label>
+                                    <div class="col-md-6 col-sm-6 col-xs-12 text-center">
+                                        @if($project->assigned_to !== null)
+                                            <a href="/admin/user/edit/{{$project->assigned_to}}">User {{$project->assigned_to}}</a>
+                                        @else
+                                            <h3> - </h3>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
                                     <label class="control-label col-md-3 col-sm-3 col-xs-12">Description</label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
                                         <textarea class="form-control col-md-7 col-xs-12" name="description">{{$project->description}}</textarea>

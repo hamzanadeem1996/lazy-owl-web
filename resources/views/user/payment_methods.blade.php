@@ -36,6 +36,14 @@
                                                 <button type="button" onclick="setMethodId({{$payment->id}})" class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#creditCardModal">Add Amount</button>
                                             @endif
                                         @endif
+
+                                        @if(Auth::user()->role == 4)
+                                            @if($payment->id == 4)
+                                                <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#addBankDetailsModal">Add Details</button>
+                                            @else
+                                                <button type="button" onclick="setMethodId({{$payment->id}})" class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#addDetailsModal">Add Details</button>
+                                            @endif
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -95,19 +103,24 @@
                     <div class="form-group">
                         <label for="acc_title">Account Title *</label>
                         <input class="form-control" type="text" name="acc_title" id="acc-title">
+                        <small style="color: red" id="acc-title-error"></small>
                     </div>
                     <div class="form-group">
                         <label for="acc_number">Account Number *</label>
                         <input class="form-control" type="number" name="acc_number" id="acc-number">
+                        <small style="color: red" id="acc-number-error"></small>
                     </div>
                     <div class="form-group">
                         <label for="bank_name">Bank Name *</label>
                         <input class="form-control" type="text" name="bank_name" id="bank-name">
+                        <small style="color: red" id="bank-name-error"></small>
                     </div>
                     <div class="form-group">
                         <label for="branch_code">Branch Code *</label>
                         <input class="form-control" type="number" name="branch_code" id="branch-code">
+                        <small style="color: red" id="branch-code-error"></small>
                     </div>
+                    <p style="color: red" id="error"></p>
                     <input type="hidden" name="payment_method_id" value="4">
                 </form>
                 <div class="modal-footer">
@@ -151,7 +164,35 @@
 
 <script>
     function submitForm(id){
-        $(`#${id}`).submit();
+        let valid = false;
+        if (id === 'bank-acc-form'){
+            if(bankAccValidations()){
+                valid = true;
+            }
+        }
+        if (valid){
+            $(`#${id}`).submit();
+        }
+    }
+
+    function bankAccValidations(){
+        let valid = true;
+        let accTitle = $('#acc-title').val(); 
+        let accNumber = $('#acc-number').val(); 
+        let bankName = $('#bank-name').val(); 
+        let branchCode = $('#branch-code').val(); 
+        
+        if ((accTitle == null || accTitle == '') || 
+            (accNumber == null || accNumber == '') || 
+            (bankName == null || bankName == '') || 
+            (branchCode == null || branchCode == '')){
+            
+            $('#error').html('Please fill out all the required fields and enter valid data');
+            valid = false;
+            
+        }
+        
+        return valid;
     }
 
     function setMethodId(id) {

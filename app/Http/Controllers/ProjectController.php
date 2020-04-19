@@ -7,6 +7,7 @@ use App\Repositories\Category\CategoryInterface;
 use App\Repositories\SubCategory\SubCategoryInterface;
 use App\Repositories\User\UserInterface;
 use App\Repositories\Wallet\WalletInterface;
+use App\Repositories\Transactions\TransactionsInterface;
 use Illuminate\Http\Request;
 use Jleon\LaravelPnotify\Notify;
 
@@ -17,19 +18,22 @@ class ProjectController extends Controller
     protected $subCategory;
     protected $user;
     protected $wallet;
+    protected $transaction;
 
     public function __construct(
         ProjectInterface        $project,
         CategoryInterface       $category,
         SubCategoryInterface    $subCategory,
         UserInterface           $user,
-        WalletInterface         $wallet
+        WalletInterface         $wallet,
+        TransactionsInterface    $transaction
     ){
         $this->project          = $project;
         $this->category         = $category;
         $this->subCategory      = $subCategory;
         $this->user             = $user;
         $this->wallet           = $wallet;
+        $this->transaction      = $transaction;
     }
 
     public function addProjectPost(Request $request){
@@ -46,17 +50,22 @@ class ProjectController extends Controller
 
     public function getUserTasks() {
         $userId = Auth::id();
-        $projects = Array();
+        $projects = null;
         $categories = $this->category->all();
 
-        $activeprojects = $this->project->getProjectsByUserId($userId);
-        $completedProjects = $this->project->getCompletedProjectsByUserId($userId);
-        $discardedProjects = $this->project->getDiscardedProjectsByUserId($userId);
-        
-        $projects['active_projects'] = $activeprojects['projects'];
-        $projects['completed_projects'] = $completedProjects['projects'];
-        $projects['discarded_projects'] = $discardedProjects['projects']; 
-        
+        if (Auth::user()->role != 4){
+            $userRole = Auth::user()->role;
+            $activeprojects = $this->project->getProjectsByUserId($userId, $userRole);
+            $completedProjects = $this->project->getCompletedProjectsByUserId($userId, $userRole);
+            $discardedProjects = $this->project->getDiscardedProjectsByUserId($userId, $userRole);
+            $projects = Array();
+            $projects['active_projects'] = $activeprojects['projects'];
+            $projects['completed_projects'] = $completedProjects['projects'];
+            $projects['discarded_projects'] = $discardedProjects['projects']; 
+        }else{
+            $projects = $this->project->getConsultantProjects($userId);
+        }
+        // return $projects;   
         return view('user.tasks', compact('projects', 'categories'));
     }
 
@@ -114,6 +123,14 @@ class ProjectController extends Controller
                 $data['amount'] = $budget;
                 $data['user_id'] = Auth::id();
                 $deductAmount = $this->wallet->minus($data);
+                
+                $transactionData = array();
+                $transactionData['user_id'] = $projectDetails['user_id'];
+                $transactionData['to_user_id'] = $projectDetails['assigned_to'];
+                $transactionData['project_id'] = $projectDetails['id'];
+                $transactionData['amount'] = $budget;
+                $transactionData['paid'] = 1;
+                $doTransaction = $this->transaction->add($transactionData);
 
                 if ($deductAmount['isSuccess'] ==  true){
                     $taskFee = $budget / 100 * env('PERCENTAGE_PER_TASK');
@@ -122,6 +139,10 @@ class ProjectController extends Controller
                     $transferData['amount'] = $amountToTransfer;
                     $transferData['user_id'] = $projectDetails['assigned_to'];
                     $transferAmount = $this->wallet->add($transferData);
+
+                    $transactionData['amount'] = $amountToTransfer;
+                    $transactionData['paid'] = 0;
+                    $doTransaction = $this->transaction->add($transactionData);
 
                     if ($transferAmount['isSuccess'] == true){
                         $project = $this->project->markComplete($data['id']);
@@ -145,6 +166,17 @@ class ProjectController extends Controller
             Notify::error($message);
         }
     
+        return redirect()->back();
+    }
+
+    public function addProjectQuery(Request $request){
+        $data = $request->all();
+        $query = $this->project->addProjectQuery($data);
+        if ($query['isSuccess'] === true){
+            Notify::success($query['message']);
+        }else{
+            Notify::error($query['message']);
+        }
         return redirect()->back();
     }
 }

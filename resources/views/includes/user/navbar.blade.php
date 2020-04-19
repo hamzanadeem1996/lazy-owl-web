@@ -37,46 +37,6 @@
 
     <div class="navbar-right">
         <div class="header-icons d-inline-block align-middle">
-            <div class="position-relative d-none d-sm-inline-block">
-                
-                <button class="header-icon btn btn-empty" type="button" id="iconMenuButton" data-toggle="dropdown"
-                        aria-haspopup="true" aria-expanded="false">
-                    <i class="simple-icon-grid"></i>
-                </button>
-                <div class="dropdown-menu dropdown-menu-right mt-3  position-absolute" id="iconMenuDropdown">
-                    <a href="#" class="icon-menu-item">
-                        <i class="iconsmind-Equalizer d-block"></i>
-                        <span>Settings</span>
-                    </a>
-
-                    <a href="#" class="icon-menu-item">
-                        <i class="iconsmind-MaleFemale d-block"></i>
-                        <span>Users</span>
-                    </a>
-
-                    <a href="#" class="icon-menu-item">
-                        <i class="iconsmind-Puzzle d-block"></i>
-                        <span>Components</span>
-                    </a>
-
-                    <a href="#" class="icon-menu-item">
-                        <i class="iconsmind-Bar-Chart d-block"></i>
-                        <span>Profits</span>
-                    </a>
-
-                    <a href="#" class="icon-menu-item">
-                        <i class="iconsmind-File-Chart d-block"></i>
-                        <span>Surveys</span>
-                    </a>
-
-                    <a href="#" class="icon-menu-item">
-                        <i class="iconsmind-Suitcase d-block"></i>
-                        <span>Tasks</span>
-                    </a>
-
-                </div>
-            </div>
-
             <div class="position-relative d-inline-block">
                 <button class="header-icon btn btn-empty" type="button" id="notificationButton" data-toggle="dropdown"
                         aria-haspopup="true" aria-expanded="false">

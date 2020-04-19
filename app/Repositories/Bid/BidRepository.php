@@ -50,6 +50,7 @@ class BidRepository implements BidRepositoryInterface {
             );
         }else{
             $project->assigned_to = $bid['user_id'];
+            $project->budget = $bid['amount'];
             if($project->save()){
                 return $result = array(
                     'isSuccess' => true,

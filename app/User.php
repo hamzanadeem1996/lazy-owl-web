@@ -73,4 +73,16 @@ class User extends Authenticatable
     public function payments(){
         return $this->hasMany(Payments::class, 'user_id');
     }
+
+    public function projectQueries(){
+        return $this->hasMany(ProjectQueries::class, 'user_id');
+    }
+
+    public function projects(){
+        return $this->hasMany(Projects::class, 'user_id');
+    }
+
+    public function transactions(){
+        return $this->hasMany(Transactions::class, 'user_id');
+    }
  }

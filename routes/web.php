@@ -19,6 +19,7 @@ Route::group(['prefix' => '/admin', 'middleware' => 'auth'], function (){
    Route::post('update_password', 'AdminController@passwordUpdate');
    Route::get('/logout', 'AdminController@logOut');
    Route::get('sub-categories/{id}', 'AdminController@getSubCategoriesByCategoryId');
+   Route::get('/transaction/history', 'PaymentsController@getAllPaymentsToAdmin');
 
    Route::group(['prefix' => '/user'], function (){
        Route::get('/add', 'AdminController@addUserForm');
@@ -32,6 +33,7 @@ Route::group(['prefix' => '/admin', 'middleware' => 'auth'], function (){
        Route::post('/edit/portfolio', 'AdminController@editUserPortfolio');
        Route::post('/comment/delete', 'AdminController@deleteComment');
        Route::get('/programme/{id}', 'AdminController@getProgrammesByDegreeId');
+       Route::get('/projects/{id}', 'AdminController@getUserProjectsById');
    });
    Route::group(['prefix' => '/service-provider'], function (){
        Route::get('/active', 'AdminController@getActiveServiceProvider');
@@ -77,6 +79,8 @@ Route::group(['prefix' => '/admin', 'middleware' => 'auth'], function (){
         Route::post('/edit', 'AdminController@editProjectPost');
         Route::get('/completed', 'AdminController@completedProjectsList');
         Route::post('/actions', 'AdminController@projectActions');
+        Route::get('/queries', 'AdminController@getProjectQueries');
+        Route::post('/query/reply', 'AdminController@postReplyToQuery');
     });
 
     Route::group(['prefix' => '/degree'], function (){
@@ -115,6 +119,7 @@ Route::group(['prefix' => 'user', 'middleware' => 'auth'], function (){
    Route::get('/qualification', 'UserController@getQualification');
    Route::get('/account/{id}', 'UserController@getUserAccount');
    Route::post('/account/image', 'UserController@updateUserProfileImage');
+   Route::post('/account/delete', 'UserController@deleteAccount');
    Route::post('/edit', 'UserController@editUserProfile');
    Route::post('/qualification', 'UserController@updateUserQualification');
    Route::post('/portfolio', 'UserController@updateUserPortfolio');
@@ -127,7 +132,9 @@ Route::group(['prefix' => 'user', 'middleware' => 'auth'], function (){
    Route::post('/project/delete', 'ProjectController@deleteProject');
    Route::post('/project/complete', 'ProjectController@completeProject');
    Route::get('/payment-methods', 'PaymentMethodsController@allPaymentMethodsList');
+   Route::get('/payment-history', 'PaymentsController@getAllPaymentsByUserId');
    Route::post('/payment', 'PaymentsController@addPayment');
    Route::post('/payment-method/details/add', 'PaymentMethodsController@addAccountDetails');
+   Route::post('/project/query', 'ProjectController@addProjectQuery');
 });
 

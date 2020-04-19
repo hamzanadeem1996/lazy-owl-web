@@ -93,7 +93,6 @@
 
                     <li><a><i class="fa fa-money"></i> Transactions <span class="fa fa-chevron-down"></span></a>
                         <ul class="nav child_menu">
-                            <li><a href="/admin/transaction/add">Add Transactions</a></li>
                             <li><a href="/admin/transaction/history">Transactions History</a></li>
                         </ul>
                     </li>
@@ -104,25 +103,25 @@
                         </ul>
                     </li>
 
-                    <li><a><i class="fa fa-bars"></i> Packages <span class="fa fa-chevron-down"></span></a>
+                    {{-- <li><a><i class="fa fa-bars"></i> Packages <span class="fa fa-chevron-down"></span></a>
                         <ul class="nav child_menu">
                             <li><a href="/admin/package/add">Add Package</a></li>
                             <li><a href="/admin/package/all">Packages List</a></li>
                         </ul>
-                    </li>
+                    </li> --}}
 
                     <li><a><i class="fa fa-question"></i> Queries <span class="fa fa-chevron-down"></span></a>
                         <ul class="nav child_menu">
-                            <li><a href="/admin/queries/project">Project Queries</a></li>
-                            <li><a href="/admin/queries/contact">Contact Queries</a></li>
+                            <li><a href="/admin/project/queries">Project Queries</a></li>
+                            <li><a href="/admin/contact/queries">Contact Queries</a></li>
                         </ul>
                     </li>
 
-                    <li><a><i class="fa fa-cogs"></i> Settings <span class="fa fa-chevron-down"></span></a>
+                    {{-- <li><a><i class="fa fa-cogs"></i> Settings <span class="fa fa-chevron-down"></span></a>
                         <ul class="nav child_menu">
                             <li><a href="/admin/settings/list">Settings List</a></li>
                         </ul>
-                    </li>
+                    </li> --}}
                 </ul>
             </div>
         </div>

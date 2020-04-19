@@ -11,4 +11,16 @@ class Projects extends Model
     public function category() {
         return $this->hasOne(Category::class, 'id', 'cat_id');
     }
+
+    public function projectQueries(){
+        return $this->hasMany(ProjectQueries::class, 'project_id');
+    }
+
+    public function user(){
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function transactions(){
+        return $this->hasMany(Transactions::class, 'project_id');
+    }
 }

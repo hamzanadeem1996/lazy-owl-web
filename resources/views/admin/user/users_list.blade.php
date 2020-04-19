@@ -54,7 +54,7 @@
                                     </td>
                                     <td>{{$user->created_at}}</td>
                                     <td class="text-right">
-                                        <a href="#"><i data-toggle="tooltip" title="Projects" class="fa fa-paper-plane"></i></a>
+                                        <a href="/admin/user/projects/{{$user->id}}"><i data-toggle="tooltip" title="Projects" class="fa fa-paper-plane"></i></a>
                                         <a href="/admin/user/edit/{{$user->id}}"><i data-toggle="tooltip" title="Edit" class="fa fa-edit"></i></a>
                                         @if($userType == 'Disabled Users')
                                             <a href="" onclick="disableModal({{$user->id}})" data-toggle="modal" data-target="#disableModal"><i data-toggle="tooltip" title="Activate" class="fa fa-check"></i></a>

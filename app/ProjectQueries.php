@@ -4,16 +4,12 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Transactions extends Model
+class ProjectQueries extends Model
 {
-    protected $table = 'transactions';
+    protected $table = 'project_queries';
 
     public function user(){
         return $this->belongsTo(User::class, 'user_id');
-    }
-
-    public function toUser(){
-        return $this->belongsTo(User::class, 'to_user_id');
     }
 
     public function project(){

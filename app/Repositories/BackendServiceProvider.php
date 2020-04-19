@@ -69,5 +69,9 @@ class BackendServiceProvider extends ServiceProvider
             'App\Repositories\Wallet\WalletInterface',
             'App\Repositories\Wallet\WalletRepository'
         );
+        $this->app->bind(
+            'App\Repositories\Transactions\TransactionsInterface',
+            'App\Repositories\Transactions\TransactionsRepository'
+        );
     }
 }

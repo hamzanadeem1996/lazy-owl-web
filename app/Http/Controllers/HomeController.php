@@ -41,7 +41,7 @@ class HomeController extends Controller
             }elseif ($roleID === 3){
                 return redirect('/user');
             }elseif ($roleID === 4){
-                return redirect('/consultant');
+                return redirect('/user');
             }
         }else{
             redirect('/login');

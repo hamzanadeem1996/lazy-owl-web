@@ -18,17 +18,33 @@
                         <a class="nav-link active" onclick="showTab('first')" id="first-tab" data-toggle="tab" href="#first" role="tab"
                             aria-controls="first" aria-selected="true">ACTIVE</a>
                     </li>
-
+                @if(Auth::user()->role != 4)
                     <li class="nav-item">
                         <a class="nav-link " onclick="showTab('second')" id="second-tab" data-toggle="tab" href="#second" role="tab"
                             aria-controls="third" aria-selected="false">COMPLETED</a>
                     </li>
+                @else
+                    <li class="nav-item">
+                        <a class="nav-link" onclick="showTab('fourth')" id="fourth-tab" data-toggle="tab" href="#fourth" role="tab"
+                            aria-controls="fourth" aria-selected="true">POSTED</a>
+                    </li>
 
+                    <li class="nav-item">
+                        <a class="nav-link" onclick="showTab('fifth')" id="fifth-tab" data-toggle="tab" href="#fifth" role="tab"
+                            aria-controls="fifth" aria-selected="true">COMPLETED (ASSIGNED)</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" onclick="showTab('sixth')" id="sixth-tab" data-toggle="tab" href="#sixth" role="tab"
+                            aria-controls="sixth" aria-selected="true">COMPLETED (POSTED)</a>
+                    </li>
+                @endif
                     <li class="nav-item">
                         <a class="nav-link " onclick="showTab('third')" id="third-tab" data-toggle="tab" href="#third" role="tab"
                             aria-controls="third" aria-selected="false">DISCARDED</a>
                     </li>
                 </ul>
+
                 <div class="card d-flex flex-row mb-3" style="background-color: #922C88;">
                     <div class="d-flex flex-grow-1 min-width-zero">
                         <div class="card-body align-self-center d-flex flex-column flex-md-row justify-content-between min-width-zero align-items-md-center">
@@ -51,7 +67,159 @@
                                 <div class="card d-flex flex-row mb-3">
                                     <div class="d-flex flex-grow-1 min-width-zero">
                                         <div class="card-body align-self-center d-flex flex-column flex-md-row justify-content-between min-width-zero align-items-md-center">
-                                            <a class="list-item-heading mb-1 truncate w-40 w-xs-100" href="Layouts.Details.html">
+                                            <a class="list-item-heading mb-1 truncate w-40 w-xs-100" href="#">
+                                                {{$task->title}}
+                                            </a>
+                                            <p class="mb-1 w-15 w-xs-100">RS {{$task->budget}}</p>
+                                            <p class="mb-1 w-15 w-xs-100">{{$task->due_date}}</p>
+                                            <div class="w-15 w-xs-100">
+                                                @if ($task->assigned_to !== null)
+                                                    <span class="badge badge-pill badge-success">Assigned</span>
+                                                @else
+                                                    <span class="badge badge-pill badge-warning">Not Assigned</span>
+                                                @endif 
+                                            </div>
+                                            
+                                            <div class="w-15 w-xs-100">
+                                                @if ($task->completed == 0)
+                                                    <span class="badge badge-pill badge-primary">Not Completed</span>
+                                                @else
+                                                    <span class="badge badge-pill badge-success">Completed</span>
+                                                @endif 
+                                            </div>
+            
+                                            <div class="w-15 w-xs-100">
+                                                <i class="fa fa-eye" id="edit-icon" onclick="getTaskDetails({{$task->id}}, 'view')" data-toggle="modal" data-target="#viewTaskModal"></i>
+                                                @if(Auth::user()->role == 2)
+                                                    <i class="fa fa-edit" id="edit-icon" onclick="getTaskDetails({{$task->id}}, 'edit')" data-toggle="modal" data-target="#editTaskModal"></i>
+                                                @endif
+                                                @if($task->assigned_to != null && Auth::user()->role == 2)
+                                                    <i class="fa fa-check" id="edit-icon" onclick="completeTask({{$task->id}})" data-toggle="modal" data-target="#completeTaskModal"></i>
+                                                @endif
+                                                @if($task->assigned_to == null && Auth::user()->role == 2)
+                                                    <i class="fa fa-gavel" id="edit-icon" onclick="getTaskBids({{$task->id}})" data-toggle="modal" data-target="#taskBidModal"></i>
+                                                    <i class="fa fa-trash" id="edit-icon" onclick="deleteTask({{$task->id}})" data-toggle="modal" data-target="#deleteTaskModal"></i>
+                                                @endif
+                                                <i class="fa fa-envelope" id="edit-icon" onclick="getTaskDetails({{$task->id}}, 'query')" data-toggle="modal" data-target="#complainModal"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @else
+                            <div class="card d-flex flex-row mb-3">
+                                <div class="d-flex flex-grow-1 min-width-zero">
+                                    <div class="card-body align-self-center d-flex flex-column flex-md-row justify-content-between min-width-zero align-items-md-center">
+                                        <h1>No Data Available</h1>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                        
+                    </div>
+                </div>
+
+                <div class="tab-content mb-4">
+                    <div class="tab-pane" id="second" role="tabpanel" aria-labelledby="second-tab" style="display: none">
+                        @if (Auth::user()->role != 4 && count($projects['completed_projects']) > 0)
+                            @foreach ($projects['completed_projects'] as $task)
+                                <div class="card d-flex flex-row mb-3">
+                                    <div class="d-flex flex-grow-1 min-width-zero">
+                                        <div class="card-body align-self-center d-flex flex-column flex-md-row justify-content-between min-width-zero align-items-md-center">
+                                            <a class="list-item-heading mb-1 truncate w-40 w-xs-100" href="#">
+                                                {{$task->title}}
+                                            </a>
+                                            <p class="mb-1 w-15 w-xs-100">RS {{$task->budget}}</p>
+                                            <p class="mb-1 w-15 w-xs-100">{{$task->due_date}}</p>
+                                            <div class="w-15 w-xs-100">
+                                                @if ($task->assigned_to !== null)
+                                                    <span class="badge badge-pill badge-success">Assigned</span>
+                                                @else
+                                                    <span class="badge badge-pill badge-warning">Not Assigned</span>
+                                                @endif 
+                                            </div>
+                                            
+                                            <div class="w-15 w-xs-100">
+                                                @if ($task->completed == 0)
+                                                    <span class="badge badge-pill badge-primary">Not Completed</span>
+                                                @else
+                                                    <span class="badge badge-pill badge-success">Completed</span>
+                                                @endif 
+                                            </div>
+            
+                                            <div class="w-15 w-xs-100">
+                                                <i class="fa fa-eye" id="edit-icon" onclick="getTaskDetails({{$task->id}}, 'view')" data-toggle="modal" data-target="#viewTaskModal"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @else
+                            <div class="card d-flex flex-row mb-3">
+                                <div class="d-flex flex-grow-1 min-width-zero">
+                                    <div class="card-body align-self-center d-flex flex-column flex-md-row justify-content-between min-width-zero align-items-md-center">
+                                        <h1>No Data Available</h1>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+                <div class="tab-content mb-4">
+                    <div class="tab-pane" id="third" role="tabpanel" aria-labelledby="third-tab" style="display: none">
+                        @if (count($projects['discarded_projects']) > 0)
+                            @foreach ($projects['discarded_projects'] as $task)
+                                <div class="card d-flex flex-row mb-3">
+                                    <div class="d-flex flex-grow-1 min-width-zero">
+                                        <div class="card-body align-self-center d-flex flex-column flex-md-row justify-content-between min-width-zero align-items-md-center">
+                                            <a class="list-item-heading mb-1 truncate w-40 w-xs-100" href="#">
+                                                {{$task->title}}
+                                            </a>
+                                            <p class="mb-1 w-15 w-xs-100">RS {{$task->budget}}</p>
+                                            <p class="mb-1 w-15 w-xs-100">{{$task->due_date}}</p>
+                                            <div class="w-15 w-xs-100">
+                                                @if ($task->assigned_to !== null)
+                                                    <span class="badge badge-pill badge-success">Assigned</span>
+                                                @else
+                                                    <span class="badge badge-pill badge-warning">Not Assigned</span>
+                                                @endif 
+                                            </div>
+                                            
+                                            <div class="w-15 w-xs-100">
+                                                @if ($task->completed == 0)
+                                                    <span class="badge badge-pill badge-primary">Not Completed</span>
+                                                @else
+                                                    <span class="badge badge-pill badge-success">Completed</span>
+                                                @endif 
+                                            </div>
+            
+                                            <div class="w-15 w-xs-100">
+                                                <i class="fa fa-eye" id="edit-icon" onclick="getTaskDetails({{$task->id}}, 'view')" data-toggle="modal" data-target="#viewTaskModal"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @else
+                            <div class="card d-flex flex-row mb-3">
+                                <div class="d-flex flex-grow-1 min-width-zero">
+                                    <div class="card-body align-self-center d-flex flex-column flex-md-row justify-content-between min-width-zero align-items-md-center">
+                                        <h1>No Data Available</h1>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+                <div class="tab-content mb-4">
+                    <div class="tab-pane" id="fourth" role="tabpanel" aria-labelledby="fourth-tab">
+                        @if (Auth::user()->role == 4 && count($projects['posted_projects']) > 0)
+                            @foreach ($projects['posted_projects'] as $task)
+                                <div class="card d-flex flex-row mb-3">
+                                    <div class="d-flex flex-grow-1 min-width-zero">
+                                        <div class="card-body align-self-center d-flex flex-column flex-md-row justify-content-between min-width-zero align-items-md-center">
+                                            <a class="list-item-heading mb-1 truncate w-40 w-xs-100" href="#">
                                                 {{$task->title}}
                                             </a>
                                             <p class="mb-1 w-15 w-xs-100">RS {{$task->budget}}</p>
@@ -99,15 +267,14 @@
                         
                     </div>
                 </div>
-
                 <div class="tab-content mb-4">
-                    <div class="tab-pane" id="second" role="tabpanel" aria-labelledby="second-tab" style="display: none">
-                        @if (count($projects['completed_projects']) > 0)
-                            @foreach ($projects['completed_projects'] as $task)
+                    <div class="tab-pane" id="fifth" role="tabpanel" aria-labelledby="fifth-tab">
+                        @if (Auth::user()->role == 4 && count($projects['completed_projects']['assigned']) > 0)
+                            @foreach ($projects['completed_projects']['assigned'] as $task)
                                 <div class="card d-flex flex-row mb-3">
                                     <div class="d-flex flex-grow-1 min-width-zero">
                                         <div class="card-body align-self-center d-flex flex-column flex-md-row justify-content-between min-width-zero align-items-md-center">
-                                            <a class="list-item-heading mb-1 truncate w-40 w-xs-100" href="Layouts.Details.html">
+                                            <a class="list-item-heading mb-1 truncate w-40 w-xs-100" href="#">
                                                 {{$task->title}}
                                             </a>
                                             <p class="mb-1 w-15 w-xs-100">RS {{$task->budget}}</p>
@@ -130,6 +297,7 @@
             
                                             <div class="w-15 w-xs-100">
                                                 <i class="fa fa-eye" id="edit-icon" onclick="getTaskDetails({{$task->id}}, 'view')" data-toggle="modal" data-target="#viewTaskModal"></i>
+                        
                                             </div>
                                         </div>
                                     </div>
@@ -144,17 +312,17 @@
                                 </div>
                             </div>
                         @endif
+                        
                     </div>
                 </div>
-
                 <div class="tab-content mb-4">
-                    <div class="tab-pane" id="third" role="tabpanel" aria-labelledby="third-tab" style="display: none">
-                        @if (count($projects['discarded_projects']) > 0)
-                            @foreach ($projects['discarded_projects'] as $task)
+                    <div class="tab-pane" id="sixth" role="tabpanel" aria-labelledby="sixth-tab">
+                        @if (Auth::user()->role == 4 && count($projects['completed_projects']['posted']) > 0)
+                            @foreach ($projects['completed_projects']['posted'] as $task)
                                 <div class="card d-flex flex-row mb-3">
                                     <div class="d-flex flex-grow-1 min-width-zero">
                                         <div class="card-body align-self-center d-flex flex-column flex-md-row justify-content-between min-width-zero align-items-md-center">
-                                            <a class="list-item-heading mb-1 truncate w-40 w-xs-100" href="Layouts.Details.html">
+                                            <a class="list-item-heading mb-1 truncate w-40 w-xs-100" href="#">
                                                 {{$task->title}}
                                             </a>
                                             <p class="mb-1 w-15 w-xs-100">RS {{$task->budget}}</p>
@@ -191,12 +359,45 @@
                                 </div>
                             </div>
                         @endif
+                        
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </main>
+
+<div class="modal fade" id="complainModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalContentLabel">Write Query To Lazy Owl</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="/user/project/query" method="POST" id="task-query-form">
+                    @csrf
+                    <div class="form-group">
+                        <label>Task Title</label>
+                        <input class="form-control" type="text" id="complain-task-title" readonly>
+                        <input type="hidden" name="project_id" id="complain-task-id">
+                        <input type="hidden" name="user_id" value="{{Auth::id()}}">
+                    </div>
+                    <div class="form-group">
+                        <label>Write Query</label>
+                        <Textarea class="form-control" rows="6" name="query"></Textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" onclick="complainSubmit()" class="btn btn-success">Submit Query</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="modal fade" id="completeTaskModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -458,6 +659,10 @@
 </div>
 
 <script>
+    function complainSubmit(){
+        $('#task-query-form').submit();
+    }
+
     function getTaskBids(id){
         $.get(`/active/task/bids/${id}`).then((response) => {
             let data = JSON.parse(response);
@@ -502,14 +707,44 @@
             $('#first').css('display', 'block');
             $('#second').css('display', 'none');
             $('#third').css('display', 'none');
+            $('#fourth').css('display', 'none');
+            $('#fifth').css('display', 'none');
+            $('#sixth').css('display', 'none');
         }else if (tabName === 'second'){
             $('#first').css('display', 'none');
             $('#second').css('display', 'block');
             $('#third').css('display', 'none');
+            $('#fourth').css('display', 'none');
+            $('#fifth').css('display', 'none');
+            $('#sixth').css('display', 'none');
         }else if(tabName === 'third'){
             $('#first').css('display', 'none');
             $('#second').css('display', 'none');
             $('#third').css('display', 'block');
+            $('#fourth').css('display', 'none');
+            $('#fifth').css('display', 'none');
+            $('#sixth').css('display', 'none');
+        }else if (tabName === 'fourth'){
+            $('#first').css('display', 'none');
+            $('#second').css('display', 'none');
+            $('#third').css('display', 'none');
+            $('#fourth').css('display', 'block');
+            $('#fifth').css('display', 'none');
+            $('#sixth').css('display', 'none');
+        }else if (tabName === 'fifth'){
+            $('#first').css('display', 'none');
+            $('#second').css('display', 'none');
+            $('#third').css('display', 'none');
+            $('#fourth').css('display', 'none');
+            $('#fifth').css('display', 'block');
+            $('#sixth').css('display', 'none');
+        }else if (tabName === 'sixth'){
+            $('#first').css('display', 'none');
+            $('#second').css('display', 'none');
+            $('#third').css('display', 'none');
+            $('#fourth').css('display', 'none');
+            $('#fifth').css('display', 'none');
+            $('#sixth').css('display', 'block');
         }
     }
 
@@ -683,7 +918,11 @@
     function getTaskDetails(id, type){
         $.get(`/user/project/${id}`).then((response) => {
             let data = JSON.parse(response);
-            console.log(data);
+            
+            if (type === 'query'){
+                $('#complain-task-title').val(data.title);
+                $('#complain-task-id').val(data.id);
+            }
             let subCategories = data.all_sub_categories;
             if (type === 'view'){ 
                 $('#view-title').html(data.title);

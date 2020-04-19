@@ -8,6 +8,12 @@ use Illuminate\Support\Facades\Hash;
 
 class UserRepository implements UserInterface {
 
+    public function deleteAccount($id){
+        $user = User::find($id);
+        $user->delete();
+        return true;
+    }
+
     public function addProfileImage($data){
         $user = User::find($data['user_id']);
 

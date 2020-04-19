@@ -122,4 +122,12 @@ class UserController extends Controller
         }
         return redirect()->back();
     }
+
+    public function deleteAccount(Request $request){
+        $data = $request->all();
+        $delete = $this->user->deleteAccount($data['user_id']);
+        if ($delete){
+            return redirect('/login');
+        }
+    }
 }

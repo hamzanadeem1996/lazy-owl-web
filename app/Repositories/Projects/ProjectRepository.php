@@ -1,6 +1,7 @@
 <?php
 namespace App\Repositories\Projects;
 use App\Projects;
+use App\ProjectQueries;
 use Illuminate\Support\Facades\Auth;
 class ProjectRepository implements ProjectInterface {
 
@@ -177,14 +178,11 @@ class ProjectRepository implements ProjectInterface {
         }
     }
 
-    public function getCompletedProjectsByUserId($id){
-        $userId = Auth::id();
-        $userRole = Auth::user()->role;
-
+    public function getCompletedProjectsByUserId($id, $userRole){
         if ($userRole == 2){
-            $projects = Projects::where('user_id', $userId)->where('status', 1)->where('completed', 1)->get();
+            $projects = Projects::where('user_id', $id)->where('status', 1)->where('completed', 1)->get();
         }else{
-            $projects = Projects::where('assigned_to', $userId)->where('status', 1)->where('completed', 1)->get();
+            $projects = Projects::where('assigned_to', $id)->where('status', 1)->where('completed', 1)->get();
         }
         
         if (isset($projects)){
@@ -203,14 +201,11 @@ class ProjectRepository implements ProjectInterface {
         }
     }
 
-    public function getProjectsByUserId($id){
-        $userId = Auth::id();
-        $userRole = Auth::user()->role;
-
+    public function getProjectsByUserId($id, $userRole){
         if ($userRole == 2){
-            $projects = Projects::where('user_id', $userId)->where('status', 1)->where('completed', 0)->get();
+            $projects = Projects::where('user_id', $id)->where('status', 1)->where('completed', 0)->get();
         }else{
-            $projects = Projects::where('assigned_to', $userId)->where('status', 1)->where('completed', 0)->get();
+            $projects = Projects::where('assigned_to', $id)->where('status', 1)->where('completed', 0)->get();
         }
         
         if (isset($projects)){
@@ -229,14 +224,11 @@ class ProjectRepository implements ProjectInterface {
         }
     }
 
-    public function getDiscardedProjectsByUserId($id){
-        $userId = Auth::id();
-        $userRole = Auth::user()->role;
-        
+    public function getDiscardedProjectsByUserId($id, $userRole){
         if ($userRole == 2){
-            $projects = Projects::where('user_id', $userId)->where('status', 0)->get();
+            $projects = Projects::where('user_id', $id)->where('status', 0)->get();
         }else{
-            $projects = Projects::where('assigned_to', $userId)->where('status', 0)->get();
+            $projects = Projects::where('assigned_to', $id)->where('status', 0)->get();
         }
         
         if (isset($projects)){
@@ -258,5 +250,58 @@ class ProjectRepository implements ProjectInterface {
     public function getUserProjectsCount($id){
         $projects = Projects::where('assigned_to', $id)->where('completed', 1)->count();
         return $projects;
+    }
+
+    public function getConsultantProjects($id){
+        $projects = array();
+        $projects['active_projects']    = Projects::where('assigned_to', $id)->where('status', 1)->where('completed', 0)->get();
+        $projects['posted_projects']    = Projects::where('user_id', $id)->where('status', 1)->where('completed', 0)->get();
+        $projects['discarded_projects'] = Projects::where('user_id', $id)->where('status', 0)->where('completed', 0)->get();
+        $projects['completed_projects']['assigned'] = Projects::where('assigned_to', $id)->where('status', 1)->where('completed', 1)->get();
+        $projects['completed_projects']['posted'] = Projects::where('user_id', $id)->where('status', 1)->where('completed', 1)->get();
+        return $projects;
+    }
+
+    public function addProjectQuery($data){
+        $query = new ProjectQueries();
+        $query->user_id = $data['user_id'];
+        $query->project_id = $data['project_id'];
+        $query->query = $data['query'];
+        if ($query->save()){
+            return $response = array(
+                'isSuccess' => true,
+                'message'   => 'Query submitted Successfully',
+                'status'    => 200
+            );
+        }else{
+            return $response = array(
+                'isSuccess' => false,
+                'message'   => 'Internal Server Error',
+                'status'    => 500
+            );
+        }
+    }
+
+    public function getProjectQueries() {
+        return ProjectQueries::where('status', 1)->get();
+    }
+
+    public function markQueryAnswered($id){
+        $query = ProjectQueries::find($id);
+        $query->is_answered = 1;
+        
+        if ($query->save()){
+            return $response = array(
+                'isSuccess' => true,
+                'message'   => 'Query Answered Successfully',
+                'status'    => 200
+            );
+        }else{
+            return $response = array(
+                'isSuccess' => false,
+                'message'   => 'Internal Server Error',
+                'status'    => 500
+            );
+        }
     }
 }

@@ -285,7 +285,7 @@
                 </div>
 
                 <div class="row" 
-                    @if(Auth::user()->role !== 3)    
+                    @if(Auth::user()->role == 2)    
                         style="display: none"
                     @endif
                 >
@@ -368,10 +368,52 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="row">
+                                    <h5 class="mb-4" style="display: inline-block; color: #73236B">Delete Account</h5>
+                                    <hr>
+                                </div>
+                                <div class="row mt-4">
+                                    <button class="btn btn-danger" data-toggle="modal" data-target="#deleteAccountModal">Delete Account</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </main>
+
+<div class="modal fade" id="deleteAccountModal" tabindex="-1" role="dialog" aria-labelledby="deleteServiceModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">
+                    Delete Account
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h4>Are you sure you want to delete this account?</h4>
+                <form id="delete-account-form" method="POST" action="/user/account/delete">
+                    <input type="hidden" name="user_id" value="{{Auth::id()}}">
+                    @csrf
+                </form>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" onclick="deleteAccountForm()" class="btn btn-danger" id="submitButton">Delete Account</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="modal fade" id="deleteServiceModal" tabindex="-1" role="dialog" aria-labelledby="deleteServiceModal" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -400,6 +442,10 @@
 </div>
 
 <script>
+    function deleteAccountForm(){
+        $('#delete-account-form').submit();
+    }
+
     @if($user->degree)
         window.onload = getUserData();
         

@@ -48,6 +48,9 @@
                                                 <option value="4">4</option>
                                                 <option value="5">5</option>
                                             </select>
+                                            @if($user->role == 4)
+                                                <h3 class="mt-5">(Consultant)</h3>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>

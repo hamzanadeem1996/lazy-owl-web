@@ -11,14 +11,14 @@
                     </div>
                     <div class="col-lg-6" style="text-align: right">
                         <div
-                            @if(Auth::user()->role !== 2)
+                            @if(Auth::user()->role == 3)
                                 style="display: none"
                             @endif
                         >
-
+                            <button 
+                                class="btn btn-primary" data-backdrop="static" 
+                                data-toggle="modal" data-target="#deleteServiceModal">Post a Task</button>
                         </div>
-                        <button class="btn btn-primary" data-backdrop="static" 
-                            data-toggle="modal" data-target="#deleteServiceModal">Post a Task</button>
                     </div>
                 </div>
                 <div class="separator mb-5"></div>

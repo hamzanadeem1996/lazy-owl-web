@@ -11,4 +11,5 @@ interface UserInterface {
     public function addQualification($data);
     public function addPortfolio($data);
     public function addProfileImage($data);
+    public function deleteAccount($id);
 }

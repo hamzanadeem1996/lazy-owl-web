@@ -12,8 +12,10 @@ interface ProjectInterface {
     public function markComplete($id);
     public function markDiscarded($id);
     public function markActive($id);
-    public function getProjectsByUserId($id);
-    public function getCompletedProjectsByUserId($id);
+    public function getProjectsByUserId($id, $role);
+    public function getCompletedProjectsByUserId($id, $role);
     public function getUnAssignedProjects();
     public function getUserProjectsCount($id);
+    public function getConsultantProjects($id);
+    public function addProjectQuery($data);
 }

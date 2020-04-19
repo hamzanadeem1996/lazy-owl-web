@@ -1,7 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Mail;
+use App\Mail\QueryReply;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Jleon\LaravelPnotify\Notify;
@@ -15,7 +16,7 @@ use App\Repositories\Projects\ProjectInterface;
 use App\Repositories\Degree\DegreeInterface;
 use App\Repositories\Programme\ProgrammeInterface;
 use App\Repositories\Admin\AdminRepositoryInterface;
-// use MongoDB\Driver\Session;
+
 
 
 class AdminController extends Controller
@@ -63,6 +64,31 @@ class AdminController extends Controller
     public function logOut(){
         Auth::logout();
         return redirect('/');
+    }
+
+    public function getUserProjectsById($id){
+        $user = $this->user->get($id);
+        $projects = $this->project->getProjectsByUserId($id, $user['role']);
+        $projects = $projects['projects'];
+        $projectType = 'Active Projects';
+        return view('admin.user.user_projects_list', compact('projects', 'projectType'));
+    }
+
+    public function postReplyToQuery(Request $request){
+        $data = $request->all();
+        $mail = Mail::to($data['user_email'])->send(new QueryReply($data));
+        $query = $this->project->markQueryAnswered($data['query_id']);
+        if ($query['isSuccess'] == true){
+            Notify::success($query['message']);
+        }else{
+            Notify::error($query['message']);
+        }
+        return redirect()->back();
+    }
+
+    public function getProjectQueries(){
+        $queries = $this->project->getProjectQueries();
+        return view('admin.queries.project_queries_list', compact('queries'));
     }
 
     public function getAdminProfile(){
