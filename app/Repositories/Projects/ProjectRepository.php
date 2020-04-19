@@ -224,6 +224,10 @@ class ProjectRepository implements ProjectInterface {
         }
     }
 
+    public function getAssignedProjectsByUserId($userId){
+        return Projects::where('user_id', $userId)->where('status', 1)->where('completed', 0)->where('assigned_to', '!=', null)->get();
+    }
+
     public function getDiscardedProjectsByUserId($id, $userRole){
         if ($userRole == 2){
             $projects = Projects::where('user_id', $id)->where('status', 0)->get();

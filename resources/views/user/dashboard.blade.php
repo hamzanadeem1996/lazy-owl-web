@@ -30,9 +30,7 @@
                         <div class="card">
                             <div class="card-body d-flex justify-content-between align-items-center">
                                 <h6 class="mb-0">Active Tasks</h6>
-                                <div role="progressbar" class="progress-bar-circle position-relative" data-color="#922c88"
-                                     data-trailColor="#d7d7d7" aria-valuemax="100" aria-valuenow="40" data-show-percent="true">
-                                </div>
+                                <h1 style="font-size: 40; color: #922c88">{{$projects['active']}}</h1>
                             </div>
                         </div>
                     </div>
@@ -40,9 +38,7 @@
                         <div class="card">
                             <div class="card-body d-flex justify-content-between align-items-center">
                                 <h6 class="mb-0">Assigned Tasks</h6>
-                                <div role="progressbar" class="progress-bar-circle position-relative" data-color="#922c88"
-                                     data-trailColor="#d7d7d7" aria-valuemax="100" aria-valuenow="40" data-show-percent="true">
-                                </div>
+                                <h1 style="font-size: 40; color: #922c88">{{Auth::user()->role == 3 ? $projects['active']: $projects['assigned']}}</h1>
                             </div>
                         </div>
                     </div>
@@ -50,9 +46,7 @@
                         <div class="card">
                             <div class="card-body d-flex justify-content-between align-items-center">
                                 <h6 class="mb-0">Awaiting Payment</h6>
-                                <div role="progressbar" class="progress-bar-circle position-relative" data-color="#922c88"
-                                     data-trailColor="#d7d7d7" aria-valuemax="100" aria-valuenow="40" data-show-percent="true">
-                                </div>
+                                <h1 style="font-size: 40; color: #922c88">{{$projects['assigned']}}</h1>
                             </div>
                         </div>
                     </div>
@@ -60,9 +54,7 @@
                         <div class="card">
                             <div class="card-body d-flex justify-content-between align-items-center">
                                 <h6 class="mb-0">Completed</h6>
-                                <div role="progressbar" class="progress-bar-circle position-relative" data-color="#FFFFFF"
-                                     data-trailColor="#FFFFFF" aria-valuemax="100" aria-valuenow="40" data-show-percent="true">
-                                </div>
+                                <h1 style="font-size: 40; color: #922c88">{{$projects['completed']}}</h1>
                             </div>
                         </div>
                     </div>

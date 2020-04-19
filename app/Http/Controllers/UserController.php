@@ -7,7 +7,9 @@ use App\Repositories\Programme\ProgrammeInterface;
 use App\Repositories\Category\CategoryInterface;
 use App\Repositories\SubCategory\SubCategoryInterface;
 use App\Repositories\ServiceProvider\ServiceProviderInterface;
+use App\Repositories\Projects\ProjectInterface;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Jleon\LaravelPnotify\Notify;
 
 class UserController extends Controller
@@ -18,6 +20,7 @@ class UserController extends Controller
     protected $category;
     protected $subCategory;
     protected $serviceProvider;
+    protected $project;
 
     public function __construct(
         UserInterface $user, 
@@ -25,10 +28,12 @@ class UserController extends Controller
         ProgrammeInterface $programe,
         CategoryInterface $category,
         SubCategoryInterface $subCategory,
-        ServiceProviderInterface $serviceProvider
+        ServiceProviderInterface $serviceProvider,
+        ProjectInterface $project
     ){
         $this->user             = $user;
         $this->degree           = $degree;
+        $this->project          = $project;
         $this->programe         = $programe;
         $this->category         = $category;
         $this->subCategory      = $subCategory;
@@ -36,8 +41,19 @@ class UserController extends Controller
     }
 
     public function index(){
+        $userId = Auth::id();
+        $userRole = Auth::user()->role;
+        
+        $activeProjetcs = $this->project->getProjectsByUserId($userId, $userRole); 
+        $assignedProjetcs = $this->project->getAssignedProjectsByUserId($userId);
+        $completedProjects = $this->project->getCompletedProjectsByUserId($userId, $userRole);
+
+        $projects['completed'] = count($completedProjects['projects']);
+        $projects['active'] = count($activeProjetcs['projects']);
+        $projects['assigned'] = count($assignedProjetcs);
+        
         $categories = $this->category->all();
-        return view('user.dashboard', compact('categories'));
+        return view('user.dashboard', compact('categories', 'projects'));
     }
 
     public function userProfileView($id){
