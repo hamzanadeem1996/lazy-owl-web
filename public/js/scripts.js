@@ -43,7 +43,8 @@ function loadStyle(href, callback) {
   }
 
   $(".theme-color[data-theme='" + theme + "']").addClass("active");
-  loadStyle(`http://localhost:8000/css/` + theme, onStyleComplete);
+  // loadStyle(`http://localhost:8000/css/` + theme, onStyleComplete);
+  loadStyle(`https://lazy-owl.herokuapp.com/css/` + theme, onStyleComplete);
   function onStyleComplete() {
     setTimeout(onStyleCompleteDelayed, 300);
   }
