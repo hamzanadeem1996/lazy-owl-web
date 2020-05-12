@@ -31,7 +31,8 @@ class ProjectRepository implements ProjectInterface {
             return $response = array(
               'isSuccess' => true,
               'status' => 200,
-              'message' => 'Project added successfully'
+              'message' => 'Project added successfully',
+              'project' => $project
             );
         }else{
             return $response = array(
@@ -97,9 +98,13 @@ class ProjectRepository implements ProjectInterface {
         return $projects = Projects::where('status', 1)->where('completed', 0)->get();
     }
 
-    public function getUnAssignedProjects()
+    public function getUnAssignedProjects($offset = null, $limit = null)
     {
-        return $projects = Projects::where('status', 1)->where('completed', 0)->where('assigned_to', null)->get();
+        if ($offset && $limit){
+            return $projects = Projects::where('status', 1)->where('completed', 0)->where('assigned_to', null)->offset($offset)->limit($limit)->get();
+        } else {
+            return $projects = Projects::where('status', 1)->where('completed', 0)->where('assigned_to', null)->get();
+        }
     }
 
     public function discarded()
@@ -306,6 +311,14 @@ class ProjectRepository implements ProjectInterface {
                 'message'   => 'Internal Server Error',
                 'status'    => 500
             );
+        }
+    }
+
+    public function searchProjects($title, $offset = null, $limit = null) {
+        if ($offset && $limit){
+            return Projects::where('title', 'LIKE', '%'.$title.'%')->offset($offset)->limit($limit)->get();
+        } else {
+            return Projects::where('title', 'LIKE', '%'.$title.'%')->get();
         }
     }
 }

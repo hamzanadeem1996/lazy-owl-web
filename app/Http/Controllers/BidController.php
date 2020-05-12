@@ -16,6 +16,8 @@ class BidController extends Controller
     }
     public function addBidToTask(Request $request){
         $data = $request->all();
+        $data['user_id'] = Auth::id();
+        
         $addBid = $this->bid->add($data);
         if ($addBid['isSuccess'] === true){
             Notify::success($addBid['message']);

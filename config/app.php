@@ -175,7 +175,8 @@ return [
         App\Providers\RouteServiceProvider::class,
         App\Repositories\BackendServiceProvider::class,
         Jleon\LaravelPnotify\NotifyServiceProvider::class,
-        UxWeb\SweetAlert\SweetAlertServiceProvider::class
+        UxWeb\SweetAlert\SweetAlertServiceProvider::class,
+        Laravel\Passport\PassportServiceProvider::class,
     ],
 
     /*

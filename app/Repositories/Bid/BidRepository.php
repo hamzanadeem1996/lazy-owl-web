@@ -6,7 +6,7 @@ use App\Projects;
 
 class BidRepository implements BidRepositoryInterface { 
     public function add($data){
-        $check = Bids::where('project_id', $data['project_id'])->where('user_id', Auth::id())->get();
+        $check = Bids::where('project_id', $data['project_id'])->where('user_id', $data['user_id'])->get();
         if (count($check) > 0){
             return $result = array(
                 'isSuccess' => false,
@@ -15,7 +15,7 @@ class BidRepository implements BidRepositoryInterface {
             );
         }else{
             $bid = new Bids();
-            $bid->user_id = Auth::id();
+            $bid->user_id = $data['user_id'];
             $bid->project_id = $data['project_id'];
             $bid->amount = $data['amount'];
             if ($bid->save()){

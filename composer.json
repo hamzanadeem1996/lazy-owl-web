@@ -13,7 +13,9 @@
         "jorgejavierleon/laravelpnotify": "~1.0",
         "laravel/cashier": "^11.1",
         "laravel/framework": "^6.2",
+        "laravel/passport": "^9.1",
         "laravel/tinker": "^1.0",
+        "nesbot/carbon": "^2.33",
         "stripe/stripe-php": "^7.28",
         "uxweb/sweet-alert": "^2.0"
     },

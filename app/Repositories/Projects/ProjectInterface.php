@@ -14,7 +14,7 @@ interface ProjectInterface {
     public function markActive($id);
     public function getProjectsByUserId($id, $role);
     public function getCompletedProjectsByUserId($id, $role);
-    public function getUnAssignedProjects();
+    public function getUnAssignedProjects($offset = null, $limit = null);
     public function getUserProjectsCount($id);
     public function getConsultantProjects($id);
     public function addProjectQuery($data);
