@@ -100,4 +100,8 @@ class PaymentMethodsRepository implements PaymentMethodsInterface {
             }
         }
     }
+
+    public function getUserCardDetails($userId) {
+        return UserBankAcc::where('user_id', $userId)->get();
+    }
 }

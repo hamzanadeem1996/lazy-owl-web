@@ -72,7 +72,8 @@ class ProjectRepository implements ProjectInterface {
             return $response = array(
                 'isSuccess' => true,
                 'status' => 200,
-                'message' => 'Project updated successfully'
+                'message' => 'Project updated successfully',
+                'project'  => $project
             );
         }else{
             return $response = array(
@@ -119,17 +120,20 @@ class ProjectRepository implements ProjectInterface {
             $project->completed = 1;
             if ($project->save()){
                 return $response = array(
+                    'status'    => 200,
                     'isSuccess' => true,
-                    'message'   => 'Project updated successfully'
+                    'message'   => 'Project marked completed successfully'
                 );
             }else{
                 return $response = array(
+                    'status'    => 500,
                     'isSuccess' => false,
                     'message'   => 'Internal Server Error'
                 );
             }
         }else{
             return $response = array(
+                'status'    => 400,
                 'isSuccess' => false,
                 'message'   => 'Project does not exists'
             );
@@ -143,17 +147,20 @@ class ProjectRepository implements ProjectInterface {
             $project->status = 0;
             if ($project->save()){
                 return $response = array(
+                    'status'    => 200,
                     'isSuccess' => true,
-                    'message'   => 'Project updated successfully'
+                    'message'   => 'Project discarded successfully'
                 );
             }else{
                 return $response = array(
+                    'status'    => 500,
                     'isSuccess' => false,
                     'message'   => 'Internal Server Error'
                 );
             }
         }else{
             return $response = array(
+                'status'    => 400,
                 'isSuccess' => false,
                 'message'   => 'Project does not exists'
             );
@@ -183,12 +190,21 @@ class ProjectRepository implements ProjectInterface {
         }
     }
 
-    public function getCompletedProjectsByUserId($id, $userRole){
-        if ($userRole == 2){
-            $projects = Projects::where('user_id', $id)->where('status', 1)->where('completed', 1)->get();
-        }else{
-            $projects = Projects::where('assigned_to', $id)->where('status', 1)->where('completed', 1)->get();
-        }
+    public function getCompletedProjectsByUserId($id, $userRole, $offset = null, $limit = null){
+        if ($offset && $limit) {
+            if ($userRole == 2){
+                $projects = Projects::where('user_id', $id)->where('status', 1)->where('completed', 1)->offset($offset)->limit($limit)->get();
+            }else{
+                $projects = Projects::where('assigned_to', $id)->where('status', 1)->where('completed', 1)->offset($offset)->limit($limit)->get();
+            }
+         } else {
+            if ($userRole == 2){
+                $projects = Projects::where('user_id', $id)->where('status', 1)->where('completed', 1)->get();
+            }else{
+                $projects = Projects::where('assigned_to', $id)->where('status', 1)->where('completed', 1)->get();
+            }
+         }
+        
         
         if (isset($projects)){
             return $response = array(
@@ -206,12 +222,21 @@ class ProjectRepository implements ProjectInterface {
         }
     }
 
-    public function getProjectsByUserId($id, $userRole){
-        if ($userRole == 2){
-            $projects = Projects::where('user_id', $id)->where('status', 1)->where('completed', 0)->get();
-        }else{
-            $projects = Projects::where('assigned_to', $id)->where('status', 1)->where('completed', 0)->get();
+    public function getProjectsByUserId($id, $userRole, $offset = null, $limit = null){
+        if ($offset && $limit) {
+            if ($userRole == 2){
+                $projects = Projects::where('user_id', $id)->where('status', 1)->where('completed', 0)->offset($offset)->limit($limit)->get();
+            }else{
+                $projects = Projects::where('assigned_to', $id)->where('status', 1)->where('completed', 0)->offset($offset)->limit($limit)->get();
+            }
+        } else {
+            if ($userRole == 2){
+                $projects = Projects::where('user_id', $id)->where('status', 1)->where('completed', 0)->get();
+            }else{
+                $projects = Projects::where('assigned_to', $id)->where('status', 1)->where('completed', 0)->get();
+            }
         }
+        
         
         if (isset($projects)){
             return $response = array(
@@ -233,12 +258,21 @@ class ProjectRepository implements ProjectInterface {
         return Projects::where('user_id', $userId)->where('status', 1)->where('completed', 0)->where('assigned_to', '!=', null)->get();
     }
 
-    public function getDiscardedProjectsByUserId($id, $userRole){
-        if ($userRole == 2){
-            $projects = Projects::where('user_id', $id)->where('status', 0)->get();
-        }else{
-            $projects = Projects::where('assigned_to', $id)->where('status', 0)->get();
+    public function getDiscardedProjectsByUserId($id, $userRole, $offset = null, $limit = null){
+        if ($offset && $limit) {
+            if ($userRole == 2){
+                $projects = Projects::where('user_id', $id)->where('status', 0)->offset($offset)->limit($limit)->get();
+            }else{
+                $projects = Projects::where('assigned_to', $id)->where('status', 0)->offset($offset)->limit($limit)->get();
+            }
+        } else {
+            if ($userRole == 2){
+                $projects = Projects::where('user_id', $id)->where('status', 0)->get();
+            }else{
+                $projects = Projects::where('assigned_to', $id)->where('status', 0)->get();
+            }
         }
+        
         
         if (isset($projects)){
             return $response = array(
@@ -261,13 +295,22 @@ class ProjectRepository implements ProjectInterface {
         return $projects;
     }
 
-    public function getConsultantProjects($id){
+    public function getConsultantProjects($id, $offset = null, $limit = null){
         $projects = array();
-        $projects['active_projects']    = Projects::where('assigned_to', $id)->where('status', 1)->where('completed', 0)->get();
-        $projects['posted_projects']    = Projects::where('user_id', $id)->where('status', 1)->where('completed', 0)->get();
-        $projects['discarded_projects'] = Projects::where('user_id', $id)->where('status', 0)->where('completed', 0)->get();
-        $projects['completed_projects']['assigned'] = Projects::where('assigned_to', $id)->where('status', 1)->where('completed', 1)->get();
-        $projects['completed_projects']['posted'] = Projects::where('user_id', $id)->where('status', 1)->where('completed', 1)->get();
+        if ($offset && $limit) {
+            $projects['active_projects']    = Projects::where('assigned_to', $id)->where('status', 1)->where('completed', 0)->offset($offset)->limit($limit)->get();
+            $projects['posted_projects']    = Projects::where('user_id', $id)->where('status', 1)->where('completed', 0)->offset($offset)->limit($limit)->get();
+            $projects['discarded_projects'] = Projects::where('user_id', $id)->where('status', 0)->where('completed', 0)->offset($offset)->limit($limit)->get();
+            $projects['completed_projects']['assigned'] = Projects::where('assigned_to', $id)->where('status', 1)->where('completed', 1)->offset($offset)->limit($limit)->get();
+            $projects['completed_projects']['posted'] = Projects::where('user_id', $id)->where('status', 1)->where('completed', 1)->offset($offset)->limit($limit)->get();
+        } else {
+            $projects['active_projects']    = Projects::where('assigned_to', $id)->where('status', 1)->where('completed', 0)->get();
+            $projects['posted_projects']    = Projects::where('user_id', $id)->where('status', 1)->where('completed', 0)->get();
+            $projects['discarded_projects'] = Projects::where('user_id', $id)->where('status', 0)->where('completed', 0)->get();
+            $projects['completed_projects']['assigned'] = Projects::where('assigned_to', $id)->where('status', 1)->where('completed', 1)->get();
+            $projects['completed_projects']['posted'] = Projects::where('user_id', $id)->where('status', 1)->where('completed', 1)->get();
+        }
+        
         return $projects;
     }
 

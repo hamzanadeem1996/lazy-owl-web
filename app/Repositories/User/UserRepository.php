@@ -27,18 +27,21 @@ class UserRepository implements UserInterface {
 
             if ($user->save()){
                 return $result = array(
+                    'status' => 200,
                     'isSuccess' => true,
                     'imageName' => $user->image,
                     'message' => "Profile Image Updated Successfully"
                 );
             }else{
                 return $result = array(
+                    'status' => 500,
                     'isSuccess' => false,
                     'message' => 'Internal Server Error'
                 );
             }
         }else{
             return $result = array(
+                'status' => 500,
                 'isSuccess' => false,
                 'message' => 'Internal Server Error'
             );
@@ -122,6 +125,8 @@ class UserRepository implements UserInterface {
             $user->gender = $data['gender'];
             $user->phone = $data['phone'];
             $user->address = $data['address'];
+            $user->city = $data['city'];
+            $user->description = $data['description'];
 
             if (isset($data['files'])) {
                 $files = $data['files'];
@@ -131,22 +136,27 @@ class UserRepository implements UserInterface {
                 $data['image'] = "$categoryImage";
                 $user->image = $data['image'];
             }else{
-                $user->image = $data['default_image'];
+                if (isset($data['default_image'])) {
+                    $user->image = $data['default_image'];
+                }
             }
 
             if ($user->save()){
                 return $result = array(
+                    'status'   => 200,
                     'isSuccess' => true,
-                    'message' => 'User Updated Successfully'
+                    'message' => 'Profile Updated Successfully'
                 );
             }else{
                 return $result = array(
+                    'status'   => 500,
                     'isSuccess' => false,
                     'message' => 'Internal Server Error'
                 );
             }
         }else{
             return $result = array(
+                'status'   => 400,
                 'isSuccess' => false,
                 'message' => 'User does not exists'
             );
@@ -251,7 +261,8 @@ class UserRepository implements UserInterface {
                     if ($updateUser){
                         return $result = array(
                             'isSuccess' => true,
-                            'message' => 'Profile Updated Successfully',
+                            'profile_image_url' => env('APP_URL')."/portfolio/".$data['portfolio'],
+                            'message' => 'Portfolio updated Successfully',
                             'status' => 200
                         );
                     }else{
@@ -306,6 +317,40 @@ class UserRepository implements UserInterface {
                 'message' => 'User does not exists',
                 'status' => 401
             );
+        }
+    }
+
+    public function changePassword($data) {
+        $user = User::find($data['user_id']);
+        if (!$user) {
+            return $result = array(
+                'isSuccess' => false,
+                'message' => 'User does not exists',
+                'status' => 401
+            );
+        } else {
+            if (strlen($data['password']) < 8) {
+                return $result = array(
+                    'isSuccess' => false,
+                    'message' => 'Password must be of 8 characters',
+                    'status' => 401
+                );
+            } else {
+                $user->password = Hash::make($data['password']);
+                if ($user->save()) {
+                    return $result = array(
+                        'isSuccess' => true,
+                        'message' => 'Password updated successfully',
+                        'status' => 200
+                    );
+                } else {
+                    return $result = array(
+                        'isSuccess' => false,
+                        'message' => 'Internal Server Error',
+                        'status' => 500
+                    );
+                }
+            }
         }
     }
 }

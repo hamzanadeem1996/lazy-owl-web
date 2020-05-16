@@ -1,7 +1,12 @@
 <?php
 
 use Illuminate\Support\Str;
-$DATABASE_URL = parse_url('mysql://w7vc60psiakaw3ue:xfgdja3vhh6uplf4@gp96xszpzlqupw4k.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/orqe322ywybcdjwo');
+
+$DATABASE_URL = null;
+if (env('APP_ENV') != 'local') {
+    $DATABASE_URL = parse_url('mysql://w7vc60psiakaw3ue:xfgdja3vhh6uplf4@gp96xszpzlqupw4k.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/orqe322ywybcdjwo');
+}
+
 return [
 
     /*
@@ -46,11 +51,11 @@ return [
         'mysql' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
-            'host' => $DATABASE_URL["host"],
-            'port' => $DATABASE_URL["port"],
-            'database' => ltrim($DATABASE_URL["path"], "/"),
-            'username' => $DATABASE_URL["user"],
-            'password' => $DATABASE_URL["pass"],
+            'host' => $DATABASE_URL ? $DATABASE_URL["host"]: env('DB_HOST'),
+            'port' => $DATABASE_URL ? $DATABASE_URL["port"]: env('DB_PORT'),
+            'database' => $DATABASE_URL ? ltrim($DATABASE_URL["path"], "/"): env('DB_DATABASE'),
+            'username' => $DATABASE_URL ? $DATABASE_URL["user"]: env('DB_USERNAME'),
+            'password' => $DATABASE_URL ? $DATABASE_URL["pass"]: env('DB_PASSWORD'),
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',
