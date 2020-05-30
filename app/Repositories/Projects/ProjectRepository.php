@@ -27,6 +27,10 @@ class ProjectRepository implements ProjectInterface {
             $project->media = $data['file'];
         }
 
+        if ($data['media']) {
+            $project->media = $data['media'];
+        }
+
         if ($project->save()){
             return $response = array(
               'isSuccess' => true,
@@ -68,6 +72,10 @@ class ProjectRepository implements ProjectInterface {
         //     $project->media = NULL;
         // }
 
+        if ($data['media']) {
+            $project->media = $data['media'];
+        }
+
         if ($project->save()){
             return $response = array(
                 'isSuccess' => true,
@@ -101,8 +109,8 @@ class ProjectRepository implements ProjectInterface {
 
     public function getUnAssignedProjects($offset = null, $limit = null)
     {
-        if ($offset && $limit){
-            return $projects = Projects::where('status', 1)->where('completed', 0)->where('assigned_to', null)->offset($offset)->limit($limit)->get();
+        if ($limit){
+            return $projects = Projects::where('status', 1)->where('completed', 0)->where('assigned_to', null)->offset($offset)->limit($limit)->orderBy('id', 'DESC')->get();
         } else {
             return $projects = Projects::where('status', 1)->where('completed', 0)->where('assigned_to', null)->get();
         }
@@ -191,7 +199,7 @@ class ProjectRepository implements ProjectInterface {
     }
 
     public function getCompletedProjectsByUserId($id, $userRole, $offset = null, $limit = null){
-        if ($offset && $limit) {
+        if ($limit) {
             if ($userRole == 2){
                 $projects = Projects::where('user_id', $id)->where('status', 1)->where('completed', 1)->offset($offset)->limit($limit)->get();
             }else{
@@ -223,7 +231,7 @@ class ProjectRepository implements ProjectInterface {
     }
 
     public function getProjectsByUserId($id, $userRole, $offset = null, $limit = null){
-        if ($offset && $limit) {
+        if ($limit) {
             if ($userRole == 2){
                 $projects = Projects::where('user_id', $id)->where('status', 1)->where('completed', 0)->offset($offset)->limit($limit)->get();
             }else{
@@ -259,7 +267,7 @@ class ProjectRepository implements ProjectInterface {
     }
 
     public function getDiscardedProjectsByUserId($id, $userRole, $offset = null, $limit = null){
-        if ($offset && $limit) {
+        if ($limit) {
             if ($userRole == 2){
                 $projects = Projects::where('user_id', $id)->where('status', 0)->offset($offset)->limit($limit)->get();
             }else{
@@ -297,7 +305,7 @@ class ProjectRepository implements ProjectInterface {
 
     public function getConsultantProjects($id, $offset = null, $limit = null){
         $projects = array();
-        if ($offset && $limit) {
+        if ($limit) {
             $projects['active_projects']    = Projects::where('assigned_to', $id)->where('status', 1)->where('completed', 0)->offset($offset)->limit($limit)->get();
             $projects['posted_projects']    = Projects::where('user_id', $id)->where('status', 1)->where('completed', 0)->offset($offset)->limit($limit)->get();
             $projects['discarded_projects'] = Projects::where('user_id', $id)->where('status', 0)->where('completed', 0)->offset($offset)->limit($limit)->get();
@@ -358,7 +366,7 @@ class ProjectRepository implements ProjectInterface {
     }
 
     public function searchProjects($title, $offset = null, $limit = null) {
-        if ($offset && $limit){
+        if ($limit){
             return Projects::where('title', 'LIKE', '%'.$title.'%')->offset($offset)->limit($limit)->get();
         } else {
             return Projects::where('title', 'LIKE', '%'.$title.'%')->get();

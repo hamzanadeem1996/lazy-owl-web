@@ -2,18 +2,27 @@
 namespace App\Repositories\Payments;
 use App\Payments;
 use App\Wallet;
+use App\User;
 use Illuminate\Support\Facades\Auth;
 
 class PaymentsRepository implements PaymentsInterface {
     
     public function add($data){
-        $apiKey = env('STRIPE_PRIVATE_KEY');
+        $user = User::find($data['user_id']);
+        // $apiKey = env('STRIPE_PRIVATE_KEY');
+        $apiKey = 'sk_test_GHGALBU9AOnazZwaqIKobtdb00OCXtKMpH';
         \Stripe\Stripe::setApiKey($apiKey);
         
         $token = $data['stripeToken'];
+        // $charge = \Stripe\Charge::create([
+        //     'amount' => env('STRIPE_ONE_TIME_PAYMENT'),
+        //     'currency' => env('STRIPE_CURRENCY'),
+        //     'description' => 'Lazy Owl Wallet Deposit', ? $charge['billing_details']['name'] : $user['email']
+        //     'source' => $token
+        // ]);
         $charge = \Stripe\Charge::create([
-            'amount' => env('STRIPE_ONE_TIME_PAYMENT'),
-            'currency' => env('STRIPE_CURRENCY'),
+            'amount' => 1000,
+            'currency' => 'usd',
             'description' => 'Lazy Owl Wallet Deposit',
             'source' => $token
         ]);
@@ -23,7 +32,7 @@ class PaymentsRepository implements PaymentsInterface {
             $payment->user_id           = $data['user_id'];
             $payment->transaction_id    = $charge['id'];
             $payment->amount            = $charge['amount'];
-            $payment->email             = $charge['billing_details']['name'];
+            $payment->email             = $charge['billing_details']['name'] ? $charge['billing_details']['name'] : $user['email'];
             $payment->receipt_url       = $charge['receipt_url'];
             $payment->refund_url        = $charge['refunds']['url'];
             $payment->last_four_of_card = $charge['source']['last4'];

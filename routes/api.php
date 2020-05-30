@@ -33,6 +33,7 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/update/portfolio', 'API\UserController@updateUserPortfolio');
         Route::get('/tasks/{id}', 'API\ProjectController@getUserTasks');
         Route::post('/change-password', 'API\UserController@changeUserPassword');
+        Route::post('/update/services', 'API\UserController@updateUserServices');
     });
 
     Route::group(['prefix' => '/payment'], function (){
@@ -40,6 +41,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/credit-card/details/{id}', 'API\UserController@getCardDetails');
         Route::get('/payment-methods/all', 'API\UserController@getPaymentMethods');
         Route::get('/transactions-history/{id}', 'API\UserController@getUserTransactions');
+        Route::post('/charge', 'API\UserController@chargeUser');
     });
 
     Route::get('/education-degrees/all', 'API\UserController@getAllActiveDegrees');

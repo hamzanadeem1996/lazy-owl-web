@@ -12,9 +12,11 @@ use App\Repositories\Projects\ProjectInterface;
 use App\Repositories\Category\CategoryInterface;
 use App\Repositories\SubCategory\SubCategoryInterface;
 use App\Repositories\PaymentMethods\PaymentMethodsInterface;
+use App\Repositories\ServiceProvider\ServiceProviderInterface;
+use App\Repositories\Payments\PaymentsInterface;
 use Validator;
 
-class UserController extends Controller
+class UserController extends Controller 
 {
     public $successStatus = 200;
     protected $user;
@@ -23,6 +25,8 @@ class UserController extends Controller
     protected $category;
     protected $subCategory;
     protected $payment;
+    protected $serviceProvider;
+    protected $paymentCharge;
 
     public function __construct(
         UserInterface           $user,
@@ -30,21 +34,24 @@ class UserController extends Controller
         DegreeInterface         $degree,
         CategoryInterface       $category,
         SubCategoryInterface    $subCategory,
-        PaymentMethodsInterface $payment
+        PaymentMethodsInterface $payment,
+        ServiceProviderInterface $serviceProvider,
+        PaymentsInterface       $paymentCharge
     ) {
-        $this->user         = $user;
-        $this->project      = $project;
-        $this->degree       = $degree;
-        $this->category     = $category;
-        $this->subCategory  = $subCategory;
-        $this->payment      = $payment;
+        $this->user             = $user;
+        $this->project          = $project;
+        $this->degree           = $degree;
+        $this->category         = $category;
+        $this->subCategory      = $subCategory;
+        $this->payment          = $payment;
+        $this->serviceProvider  = $serviceProvider;
+        $this->paymentCharge    = $paymentCharge;
     }
     
     public function login(Request $request){
         $request->validate([
             'email' => 'required|string|email',
-            'password' => 'required|string',
-            'remember_me' => 'boolean'
+            'password' => 'required|string'
         ]);
 
         $credentials = request(['email', 'password']);
@@ -88,7 +95,11 @@ class UserController extends Controller
             }
 
             if ($user['image']) {
-                $userImage = env('APP_URL')."/images/user/".$user['image'];
+                if (file_exists(public_path()."/images/user/".$user['image'])) {
+                    $userImage = env('APP_URL')."/images/user/".$user['image'];
+                } else {
+                    $userImage = $user['image'];
+                }
             }
 
             $user['completed_projects_count'] = count($completedProjects['projects']);
@@ -101,6 +112,7 @@ class UserController extends Controller
             $user['profile_image_url'] = $userImage;
             $user['portfolio_url'] = $userPortfolio;
             $user['services_list'] = $userServices;
+            $user['token'] = $token;
 
             unset($user['wallet']);
             unset($user['ratings']);
@@ -112,12 +124,11 @@ class UserController extends Controller
             return response()->json([
                 'status' => 200,
                 'message' => 'User logged in successfully!',
-                'token' => $token,
                 'user'=> $user
             ], 200); 
         } 
         else{ 
-            return response()->json(['error'=>'Unauthorised', 'status' => 400], 400); 
+            return response()->json(['error'=>'Invalid email or password', 'status' => 400], 400); 
         } 
     }
 
@@ -181,6 +192,7 @@ class UserController extends Controller
         $user['portfolio_url'] = $userPortfolio;
         $user['profile_image_url'] = env('APP_URL')."/images/user/dummy.png";
         $user['services_list'] = $userServices;
+        $user['token'] = $token;
 
         unset($user['wallet']);
         unset($user['ratings']);
@@ -191,7 +203,6 @@ class UserController extends Controller
         return response()->json([
             'status' => 200,
             'message' => 'User logged in successfully!',
-            'token' => $token,
             'user' => $user
         ], 200); 
     }
@@ -298,12 +309,16 @@ class UserController extends Controller
     public function updateUserProfileImage(Request $request) {
         $request->validate([
             'user_id' => 'required|integer',
-            'image' => 'required',
-            'file' => 'required'
+            'image' => 'required'
         ]);
         $data = $request->all();
         $user = $this->user->addProfileImage($data);
-        $user['profile_image_url'] = env('APP_URL')."/images/user/".$user['imageName'];
+        if (file_exists(public_path()."/images/user/".$user['imageName'])) {
+            $user['profile_image_url'] = env('APP_URL')."/images/user/".$user['imageName'];
+        } else {
+            $user['profile_image_url'] = $user['imageName'];
+        }
+        
         unset($user['imageName']);
         return $user;
     }
@@ -321,7 +336,6 @@ class UserController extends Controller
 
     public function updateUserPortfolio(Request $request) {
         $request->validate([
-            'portfolio' => 'required',
             'id' => 'required|integer'
         ]);
         $data = $request->all();
@@ -346,17 +360,22 @@ class UserController extends Controller
         foreach($services as $service) {
             $service['sub_categories'] = $service->sub_categories;
         }
-        return $services;
+        return response()->json([
+            'status' => 200,
+            'messgae' => 'Success',
+            'isSuccess' => true,
+            'services' => $services
+        ]);
     }
 
     public function addCardDetails(Request $request) {
         $request->validate([
-            'user_id' => 'required|integer',
-            'payment_method_id' => 'required|integer',
-            'bank_name' => 'required|string',
-            'acc_title' => 'required|string',
-            'acc_number' => 'required|string',
-            'branch_code' => 'required|string'
+            'user_id' => 'required',
+            'payment_method_id' => 'required',
+            'bank_name' => 'required',
+            'acc_title' => 'required',
+            'acc_number' => 'required',
+            'branch_code' => 'required'
         ]);
         $data = $request->all();
         $paymentMethod = $this->payment->addUserAccountDetails($data);
@@ -401,7 +420,16 @@ class UserController extends Controller
 
         $user = $this->user->get($id);
         $payments['card_payments'] = $user->payments;
-        $payments['wallet_payments'] = $user->transactions;
+        $wallet = $user->transactions;
+        
+        foreach($wallet as $item) {
+            $nextUser = $this->user->get($item['to_user_id']);
+            $project = $this->project->get($item['project_id']);
+            $item['user_email'] = $nextUser['email'];
+            $item['project_title'] = $project['title'];
+        }
+
+        $payments['wallet_payments'] = $wallet;
         return response()->json([
             'status' => 200,
             'messgae' => 'Success',
@@ -418,5 +446,23 @@ class UserController extends Controller
         ]);
         $password = $this->user->changePassword($data);
         return $password;
+    }
+
+    public function updateUserServices(Request $request) {
+        $data = $request->all();
+        $request->validate([
+            'service_cat_id' => 'required',
+            'service_sub_cat_id' => 'required',
+            'id' => 'required'
+        ]);
+
+        $services = $this->serviceProvider->add_services($data);
+        return $services;
+    }
+
+    public function chargeUser(Request $request) {
+        $data = $request->all();
+        $payment = $this->paymentCharge->add($data);
+        return $payment;
     }
 }

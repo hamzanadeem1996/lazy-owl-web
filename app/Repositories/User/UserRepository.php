@@ -17,7 +17,7 @@ class UserRepository implements UserInterface {
     public function addProfileImage($data){
         $user = User::find($data['user_id']);
 
-        if ($data['image'] != null) {
+        if (isset($data['file'])) {
             $files = $data['file'];
             $destinationPath = 'images/user/';
             $categoryImage = date('YmdHis') . "." . $files->getClientOriginalExtension();
@@ -39,7 +39,24 @@ class UserRepository implements UserInterface {
                     'message' => 'Internal Server Error'
                 );
             }
-        }else{
+        } elseif($data['image']){
+            $user->image = $data['image'];
+            if ($user->save()) {
+                return $result = array(
+                    'status' => 200,
+                    'isSuccess' => true,
+                    'imageName' => $user->image,
+                    'message' => "Profile Image Updated Successfully"
+                );
+            } else {
+                return $result = array(
+                    'status' => 500,
+                    'isSuccess' => false,
+                    'message' => 'Internal Server Error'
+                );
+            }
+        }
+        else{
             return $result = array(
                 'status' => 500,
                 'isSuccess' => false,
@@ -251,18 +268,13 @@ class UserRepository implements UserInterface {
         if (isset($user)){
             $check = UserPortfolio::where('user_id', $data['id'])->get();
             if (count($check) > 0){
-                if (isset($data['portfolio'])) {
-                    $files = $data['portfolio'];
-                    $destinationPath = 'portfolio/';
-                    $portfolioName = date('YmdHis') . "." . $files->getClientOriginalExtension();
-                    $files->move($destinationPath, $portfolioName);
-                    $data['portfolio'] = "$portfolioName";
-                    $updateUser = UserPortfolio::where('user_id', $data['id'])->update(['media' => $data['portfolio']]);
+                if ($data['portfolio_url']) {
+                    $updateUser = UserPortfolio::where('user_id', $data['id'])->update(['media' => $data['portfolio_url']]);
                     if ($updateUser){
                         return $result = array(
                             'isSuccess' => true,
-                            'profile_image_url' => env('APP_URL')."/portfolio/".$data['portfolio'],
-                            'message' => 'Portfolio updated Successfully',
+                            'portfolio_url' => $data['portfolio_url'],
+                            'message' => 'Profile updated Successfully',
                             'status' => 200
                         );
                     }else{
@@ -272,27 +284,47 @@ class UserRepository implements UserInterface {
                             'status' => 500
                         );
                     }
-                }else{
-                    return $result = array(
-                        'isSuccess' => false,
-                        'message' => 'Internal Server Error',
-                        'status' => 500
-                    );
+                } else {
+                    if (isset($data['portfolio'])) {
+                        $files = $data['portfolio'];
+                        $destinationPath = 'portfolio/';
+                        $portfolioName = date('YmdHis') . "." . $files->getClientOriginalExtension();
+                        $files->move($destinationPath, $portfolioName);
+                        $data['portfolio'] = "$portfolioName";
+                        $updateUser = UserPortfolio::where('user_id', $data['id'])->update(['media' => $data['portfolio']]);
+                        if ($updateUser){
+                            return $result = array(
+                                'isSuccess' => true,
+                                'profile_image_url' => env('APP_URL')."/portfolio/".$data['portfolio'],
+                                'message' => 'Profile updated Successfully',
+                                'status' => 200
+                            );
+                        }else{
+                            return $result = array(
+                                'isSuccess' => false,
+                                'message' => 'Internal Server Error',
+                                'status' => 500
+                            );
+                        }
+                    }else{
+                        return $result = array(
+                            'isSuccess' => false,
+                            'message' => 'Internal Server Error',
+                            'status' => 500
+                        );
+                    }
                 }
+                
             }else{
                 $portfolio = new UserPortfolio();
-                if (isset($data['portfolio'])) {
-                    $files = $data['portfolio'];
-                    $destinationPath = 'portfolio/';
-                    $portfolioName = date('YmdHis') . "." . $files->getClientOriginalExtension();
-                    $files->move($destinationPath, $portfolioName);
-                    $data['portfolio'] = "$portfolioName";
-                    $portfolio->media = $data['portfolio'];
+                if ($data['portfolio_url']) {
+                    $portfolio->media = $data['portfolio_url'];
     
                     $portfolio->user_id = $data['id'];
                     if ($portfolio->save()){
                         return $result = array(
                             'isSuccess' => true,
+                            'portfolio_url' => $data['portfolio_url'],
                             'message' => 'Profile Updated Successfully',
                             'status' => 200
                         );
@@ -303,12 +335,36 @@ class UserRepository implements UserInterface {
                             'status' => 500
                         );
                     }
-                }else{
-                    return $result = array(
-                        'isSuccess' => false,
-                        'message' => 'Internal Server Error',
-                        'status' => 500
-                    );
+                } else {
+                    if (isset($data['portfolio'])) {
+                        $files = $data['portfolio'];
+                        $destinationPath = 'portfolio/';
+                        $portfolioName = date('YmdHis') . "." . $files->getClientOriginalExtension();
+                        $files->move($destinationPath, $portfolioName);
+                        $data['portfolio'] = "$portfolioName";
+                        $portfolio->media = $data['portfolio'];
+        
+                        $portfolio->user_id = $data['id'];
+                        if ($portfolio->save()){
+                            return $result = array(
+                                'isSuccess' => true,
+                                'message' => 'Profile Updated Successfully',
+                                'status' => 200
+                            );
+                        }else{
+                            return $result = array(
+                                'isSuccess' => false,
+                                'message' => 'Internal Server Error',
+                                'status' => 500
+                            );
+                        }
+                    }else{
+                        return $result = array(
+                            'isSuccess' => false,
+                            'message' => 'Internal Server Error',
+                            'status' => 500
+                        );
+                    }
                 }
             }
         }else{

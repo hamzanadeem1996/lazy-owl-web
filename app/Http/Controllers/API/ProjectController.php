@@ -47,12 +47,6 @@ class ProjectController extends Controller
         $offset = $request->input('page');
         $limit = $request->input('limit');
 
-        if (!$offset || !$limit) {
-            return response()->json([
-                'status' => 401,
-                'message' => 'Some query parameters are missing'
-            ], 401);
-        }
         $projects = $this->project->getUnAssignedProjects($offset, $limit);
         
         foreach($projects as $project) {
@@ -63,11 +57,14 @@ class ProjectController extends Controller
             $project['sub_category'] = $subCategory['name'];
             $project['posted_by'] = $user['name'];
             if (isset($project['media'])) {
-                $project['media_url'] = env('APP_URL')."/images/project/".$project['media'];
+                if (file_exists(public_path()."/images/project/".$project['media'])){
+                    $project['media_url'] = env('APP_URL')."/images/project/".$project['media'];
+                } else {
+                    $project['media_url'] = $project['media'];
+                }
             } else {
                 $project['media_url'] = null;
             }
-            unset($project['media']);
         }
 
         return response()->json([
@@ -82,12 +79,6 @@ class ProjectController extends Controller
         $offset = $request->input('page');
         $limit = $request->input('limit');
 
-        if (!$offset || !$limit) {
-            return response()->json([
-                'status' => 401,
-                'message' => 'Some query parameters are missing'
-            ], 401);
-        }
         $title = $request->input('title');
         $filtered = $this->project->searchProjects($title, $offset, $limit);
 
@@ -99,11 +90,14 @@ class ProjectController extends Controller
             $project['sub_category'] = $subCategory['name'];
             $project['posted_by'] = $user['name'];
             if (isset($project['media'])) {
-                $project['media_url'] = env('APP_URL')."/images/project/".$project['media'];
+                if (file_exists(public_path()."/images/project/".$project['media'])){
+                    $project['media_url'] = env('APP_URL')."/images/project/".$project['media'];
+                } else {
+                    $project['media_url'] = $project['media'];
+                }
             } else {
                 $project['media_url'] = null;
             }
-            unset($project['media']);
         }
 
         return response()->json([
@@ -129,9 +123,17 @@ class ProjectController extends Controller
         $project['category'] = $category['name'];
         $project['sub_category'] = $subCategory['name'];
         $project['posted_by'] = $user['name'];
-        $project['media_url'] = env('APP_URL')."/images/project/".$project['media'];
+        if (isset($project['media'])) {
+            if (file_exists(public_path()."/images/project/".$project['media'])){
+                $project['media_url'] = env('APP_URL')."/images/project/".$project['media'];
+            } else {
+                $project['media_url'] = $project['media'];
+            }
+        } else {
+            $project['media_url'] = null;
+        }
 
-        unset($project['media']);
+        // unset($project['media']);
 
         return response()->json([
             'isSuccess' => true,
@@ -155,7 +157,7 @@ class ProjectController extends Controller
 
     public function addProject(Request $request) {
         $data = $request->all();
-        // return response()->json($data, 200);
+        
         $request->validate([
             'user_id'           => 'required|integer',
             'title'             => 'required|string',
@@ -173,15 +175,18 @@ class ProjectController extends Controller
         }else{
             $data['files'] = null;
         }
-        
+
         $project = $this->project->add($data);
         if ($project['project']['media']) {
-            $project['project']['media_url'] = env('APP_URL')."/images/project/".$project['project']['media'];
+            if (file_exists(public_path()."/images/project/".$project['project']['media'])){
+                $project['project']['media_url'] = env('APP_URL')."/images/project/".$project['project']['media'];
+            } else {
+                $project['project']['media_url'] = $project['project']['media'];
+            }
         } else {
             $project['project']['media_url'] = null;
         }
         
-        unset($project['project']['media']);
         $category = $this->category->get($project['project']['cat_id']);
         $subCategory = $this->subCategory->get($project['project']['sub_cat_id']);
         $user = $this->user->get($project['project']['user_id']);
@@ -204,13 +209,6 @@ class ProjectController extends Controller
         $offset = $request->input('page');
         $limit = $request->input('limit');
 
-        if (!$offset || !$limit) {
-            return response()->json([
-                'status' => 401,
-                'message' => 'Some query parameters are missing'
-            ], 401);
-        }
-
         $projects = [];
         $user = $this->user->get($userId);
         
@@ -228,12 +226,15 @@ class ProjectController extends Controller
                     $project['category'] = $category['name'];
                     $project['sub_category'] = $subCategory['name'];
                     $project['posted_by'] = $user['name'];
-                    if (isset($project['media'])){
-                        $project['media_url'] = env('APP_URL')."/images/project/".$project['media'];
+                    if (isset($project['media'])) {
+                        if (file_exists(public_path()."/images/project/".$project['media'])){
+                            $project['media_url'] = env('APP_URL')."/images/project/".$project['media'];
+                        } else {
+                            $project['media_url'] = $project['media'];
+                        }
                     } else {
                         $project['media_url'] = null;
                     }
-                    unset($project['media']);
                     $project['bids'] = $this->bid->all($project['id']);
                 }
 
@@ -244,12 +245,15 @@ class ProjectController extends Controller
                     $project['category'] = $category['name'];
                     $project['sub_category'] = $subCategory['name'];
                     $project['posted_by'] = $user['name'];
-                    if (isset($project['media'])){
-                        $project['media_url'] = env('APP_URL')."/images/project/".$project['media'];
+                    if (isset($project['media'])) {
+                        if (file_exists(public_path()."/images/project/".$project['media'])){
+                            $project['media_url'] = env('APP_URL')."/images/project/".$project['media'];
+                        } else {
+                            $project['media_url'] = $project['media'];
+                        }
                     } else {
                         $project['media_url'] = null;
                     }
-                    unset($project['media']);
                     $project['bids'] = $this->bid->all($project['id']);
                 }
 
@@ -260,12 +264,15 @@ class ProjectController extends Controller
                     $project['category'] = $category['name'];
                     $project['sub_category'] = $subCategory['name'];
                     $project['posted_by'] = $user['name'];
-                    if (isset($project['media'])){
-                        $project['media_url'] = env('APP_URL')."/images/project/".$project['media'];
+                    if (isset($project['media'])) {
+                        if (file_exists(public_path()."/images/project/".$project['media'])){
+                            $project['media_url'] = env('APP_URL')."/images/project/".$project['media'];
+                        } else {
+                            $project['media_url'] = $project['media'];
+                        }
                     } else {
                         $project['media_url'] = null;
                     }
-                    unset($project['media']);
                     $project['bids'] = $this->bid->all($project['id']);
                 }
 
@@ -281,12 +288,15 @@ class ProjectController extends Controller
                     $project['category'] = $category['name'];
                     $project['sub_category'] = $subCategory['name'];
                     $project['posted_by'] = $user['name'];
-                    if (isset($project['media'])){
-                        $project['media_url'] = env('APP_URL')."/images/project/".$project['media'];
+                    if (isset($project['media'])) {
+                        if (file_exists(public_path()."/images/project/".$project['media'])){
+                            $project['media_url'] = env('APP_URL')."/images/project/".$project['media'];
+                        } else {
+                            $project['media_url'] = $project['media'];
+                        }
                     } else {
                         $project['media_url'] = null;
                     }
-                    unset($project['media']);
                     $project['bids'] = $this->bid->all($project['id']);
                 }
 
@@ -297,12 +307,15 @@ class ProjectController extends Controller
                     $project['category'] = $category['name'];
                     $project['sub_category'] = $subCategory['name'];
                     $project['posted_by'] = $user['name'];
-                    if (isset($project['media'])){
-                        $project['media_url'] = env('APP_URL')."/images/project/".$project['media'];
+                    if (isset($project['media'])) {
+                        if (file_exists(public_path()."/images/project/".$project['media'])){
+                            $project['media_url'] = env('APP_URL')."/images/project/".$project['media'];
+                        } else {
+                            $project['media_url'] = $project['media'];
+                        }
                     } else {
                         $project['media_url'] = null;
                     }
-                    unset($project['media']);
                     $project['bids'] = $this->bid->all($project['id']);
                 }
 
@@ -313,12 +326,15 @@ class ProjectController extends Controller
                     $project['category'] = $category['name'];
                     $project['sub_category'] = $subCategory['name'];
                     $project['posted_by'] = $user['name'];
-                    if (isset($project['media'])){
-                        $project['media_url'] = env('APP_URL')."/images/project/".$project['media'];
+                    if (isset($project['media'])) {
+                        if (file_exists(public_path()."/images/project/".$project['media'])){
+                            $project['media_url'] = env('APP_URL')."/images/project/".$project['media'];
+                        } else {
+                            $project['media_url'] = $project['media'];
+                        }
                     } else {
                         $project['media_url'] = null;
                     }
-                    unset($project['media']);
                     $project['bids'] = $this->bid->all($project['id']);
                 }
 
@@ -329,12 +345,15 @@ class ProjectController extends Controller
                     $project['category'] = $category['name'];
                     $project['sub_category'] = $subCategory['name'];
                     $project['posted_by'] = $user['name'];
-                    if (isset($project['media'])){
-                        $project['media_url'] = env('APP_URL')."/images/project/".$project['media'];
+                    if (isset($project['media'])) {
+                        if (file_exists(public_path()."/images/project/".$project['media'])){
+                            $project['media_url'] = env('APP_URL')."/images/project/".$project['media'];
+                        } else {
+                            $project['media_url'] = $project['media'];
+                        }
                     } else {
                         $project['media_url'] = null;
                     }
-                    unset($project['media']);
                     $project['bids'] = $this->bid->all($project['id']);
                 }
 
@@ -345,12 +364,15 @@ class ProjectController extends Controller
                     $project['category'] = $category['name'];
                     $project['sub_category'] = $subCategory['name'];
                     $project['posted_by'] = $user['name'];
-                    if (isset($project['media'])){
-                        $project['media_url'] = env('APP_URL')."/images/project/".$project['media'];
+                    if (isset($project['media'])) {
+                        if (file_exists(public_path()."/images/project/".$project['media'])){
+                            $project['media_url'] = env('APP_URL')."/images/project/".$project['media'];
+                        } else {
+                            $project['media_url'] = $project['media'];
+                        }
                     } else {
                         $project['media_url'] = null;
                     }
-                    unset($project['media']);
                     $project['bids'] = $this->bid->all($project['id']);
                 }
             }
@@ -403,12 +425,15 @@ class ProjectController extends Controller
         
         $project = $this->project->update($data);
         if ($project['project']['media']) {
-            $project['project']['media_url'] = env('APP_URL')."/images/project/".$project['project']['media'];
+            if (file_exists(public_path()."/images/project/".$project['project']['media'])){
+                $project['project']['media_url'] = env('APP_URL')."/images/project/".$project['project']['media'];
+            } else {
+                $project['project']['media_url'] = $project['project']['media'];
+            }
         } else {
             $project['project']['media_url'] = null;
         }
         
-        unset($project['project']['media']);
         $category = $this->category->get($project['project']['cat_id']);
         $subCategory = $this->subCategory->get($project['project']['sub_cat_id']);
         $user = $this->user->get($project['project']['user_id']);
